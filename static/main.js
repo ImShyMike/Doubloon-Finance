@@ -58,14 +58,15 @@ async function loadShopData() {
     return item;
   });
 
-  // Restore the previous location
-  restoreFilter();
-
   // Render the shop data
   renderShop(shopData);
   
   // Restore selection after shop data is loaded
   restoreSelection();
+
+  // Restore the previous location
+  restoreFilter();
+  filterShop()
 }
 
 // Render the shop data
