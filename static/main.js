@@ -37,7 +37,7 @@ async function fetchJSON(url) {
 
 // Load shop data and parse it
 async function loadShopData() {
-  const jsonData = await fetchJSON("/static/shop.json");
+  const jsonData = await fetchJSON("https://raw.githubusercontent.com/ImShyMike/Doubloon-Finance/refs/heads/main/static/shop.json");
   if (!jsonData || !jsonData.value) {
     console.error("Invalid shop data format");
     return;
