@@ -280,6 +280,9 @@ function addProjectToList(name, earnings, hours) {
       totalHours -= hours;
       updateTotals();
       saveProjectsToLocalStorage();
+      if (selectedItemId) {
+        handleSelection(selectedItemId)
+      }
   });
 
   projectItem.appendChild(projectInfo);
@@ -362,5 +365,9 @@ projectForm.addEventListener("submit", (e) => {
       projectNameInput.value = "";
       projectEarningsInput.value = "";
       projectHoursInput.value = "";
+
+      if (selectedItemId) {
+        handleSelection(selectedItemId)
+      }
   }
 });
