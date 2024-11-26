@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="https://highseas.hackclub.com/doubloon.svg">
+
+    <title>Doubloon Finance</title>
+
+    <style>@import url(https://fonts.bunny.net/css?family=rethink-sans:400);</style>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <header>
+        <h1 id="title">Doubloon Finance</h1>
+    </header>
+    <main>
+        <div id="projectsContainer" class="projects-container">
+            <h2>Projects and Earnings</h2>
+            <form id="projectForm" class="project-form">
+                <input type="text" id="projectName" placeholder="Project Name" required>
+                <input type="number" id="projectEarnings" placeholder="Earnings" required>
+                <input type="number" id="projectHours" placeholder="Hours Spent" required>
+                <button type="submit">Add Project</button>
+            </form>
+
+            <ul id="projectsList" class="projects-list"></ul>
+
+            <p id="totalEarnings" class="info">Total Earnings: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></p>
+            <p id="totalHours" class="info">Total Hours: 0</p>
+            <p id="averageHourlyRate" class="info">Average Hourly Rate: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour</p>
+        </div>
+        
+        <div id="goalContainer" class="projects-container">
+            <h2>Goal</h2>
+            <p id="goalName" class="info">None (0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">)</p>
+            <p id="doubloonsLeft" class="info">Doubloons until goal: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></p>
+            <p id="timeLeft" class="info">Estimated hours left: 0</p>
+        </div>
+
+        <div class="filter-container">
+            <label for="locationFilter">Location:</label>
+            <select id="locationFilter">
+                <option value="All">️🏴‍☠️ all across the 7 seas</option>
+                <option value="Us">🇺🇸 US</option>
+                <option value="Eu">🇪🇺 EU + 🇬🇧 UK</option>
+                <option value="In">🇮🇳 India</option>
+                <option value="Ca">🍁 Canada</option>
+                <option value="Xx">🗺 other countries worldwide...</option>
+            </select>
+        </div>
+        
+        <div id="shopContainer" class="shop-container"></div>
+
+        <a id="scrollToTop" class="hidden" href="#">&#129033;</a>
+    </main>
+</body>
+<script src="static/main.js"></script>
+</html>

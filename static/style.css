@@ -1,0 +1,345 @@
+
+
+/* Catppuccin Frappe theme https://catppuccin.com/palette */
+:root {
+    --base: #303446;
+    --mantle: #292c3c;
+    --crust: #232634;
+
+    /* Text colors */
+    --text: #c6d0f5;
+    --subtext0: #a5adce;
+    --subtext1: #b5bfe2;
+
+    /* Overlay colors */
+    --surface0: #414559;
+    --surface1: #51576d;
+    --surface2: #626880;
+
+    /* Accent colors */
+    --overlay0: #6c7086;
+    --overlay1: #7c7f93;
+    --overlay2: #8c8fa1;
+
+    /* Colors */
+    --blue: #8caaee;
+    --lavender: #babbf1;
+    --rosewater: #f2d5cf;
+    --flamingo: #eebebe;
+    --pink: #f4b8e4;
+    --mauve: #ca9ee6;
+    --red: #e78284;
+    --maroon: #ea999c;
+    --peach: #ef9f76;
+    --yellow: #e5c890;
+    --green: #a6d189;
+    --teal: #81c8be;
+    --sky: #99d1db;
+
+    background-color: var(--base);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Rethink Sans', sans-serif;
+    background-color: var(--base);
+    color: var(--text);
+    margin: 0;
+    margin-bottom: 40px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text);
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--teal);
+}
+
+/* Button styles */
+button {
+    background-color: var(--blue);
+    color: var(--crust);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--sky);
+}
+
+/* Shop mockup */
+.shop-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    max-width: 1500px;
+    width: 100%;
+}
+
+.shop-item {
+    border: 2px solid var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.shop-item img {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.shop-item.selected {
+    border-color: var(--green);
+    background-color: var(--surface0);
+}
+
+.shop-item:hover {
+    background-color: var(--surface0);
+}
+
+.filter-container {
+    margin-bottom: 16px;
+}
+
+.shop-item-image {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-duration: .3s;
+}
+
+.shop-item-image:hover {
+    transform: scale(1.1);
+}
+
+.doubloon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#title {
+    color: var(--yellow);
+}
+
+#locationFilter {
+    background-color: var(--surface0);
+    border: 3px solid var(--mantle);
+    border-radius: 6px;
+    color: var(--text);
+}
+
+.not-available:hover {
+    border: 2px solid var(--red);
+    cursor: not-allowed;
+}
+
+.projects-container {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 2px solid var(--surface2);
+    border-radius: 8px;
+    background-color: var(--surface1);
+    text-align: left;
+    color: var(--text);
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+
+.projects-container h2 {
+    color: var(--yellow);
+}
+
+#projectForm {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#projectForm input {
+    padding: 10px;
+    border: 2px solid var(--surface2);
+    border-radius: 5px;
+    background-color: var(--surface0);
+    color: var(--text);
+    font-size: 14px;
+}
+
+#projectForm button {
+    background-color: var(--blue);
+    color: var(--crust);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#projectForm button:hover {
+    background-color: var(--sky);
+}
+
+.projects-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#totalEarnings, #goalName {
+    font-weight: bold;
+    color: var(--lavender);
+}
+
+.projects-list li:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: max-content;
+    padding: 5px;
+    background-color: var(--overlay0);
+    color: var(--text);
+    font-size: 12px;
+    border: 1px solid var(--surface2);
+    border-radius: 4px;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.projects-list li {
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid var(--surface2);
+    border-radius: 4px;
+    background-color: var(--surface0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-remove-btn {
+    background-color: var(--red);
+    color: var(--crust);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.project-remove-btn:hover {
+    background-color: var(--mauve);
+}
+
+.info {
+    line-height: 0.1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.project-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.project-form input {
+    flex: 1 1 100%;
+    min-width: 200px;
+    padding: 12px;
+    font-size: 1rem;
+    border: 2px solid var(--surface2);
+    border-radius: 4px;
+}
+
+.project-form button {
+    flex: 1 1 auto;
+    padding: 12px;
+    font-size: 1rem;
+    background-color: var(--blue);
+    color: var(--crust);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.project-form button:hover {
+    background-color: var(--sky);
+}
+
+/* Media queries for larger screens */
+@media (min-width: 850px) {
+    .project-form {
+        flex-wrap: nowrap;
+    }
+
+    .project-form input {
+        flex: 2 1 auto;
+    }
+
+    .project-form button {
+        flex: 1 1 auto;
+    }
+}
+
+/* Media queries for very small screens */
+@media (max-width: 480px) {
+    .project-form input, 
+    .project-form button {
+        flex: 1 1 100%;
+    }
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#scrollToTop {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--blue);
+    color: var(--mantle);
+    text-decoration: none;
+    border-radius: 50%;
+    font-size: 2.5rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    text-align: center;
+    line-height: 50px;
+}
+
+#scrollToTop:hover {
+    transform: scale(1.1);
+    background-color: var(--teal);
+}
