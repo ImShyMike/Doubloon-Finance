@@ -101,7 +101,7 @@ function renderShop(data) {
 
     shopItem.item = item;
 
-    if (item.outOfStock) {
+    if (item.outOfStock || item.comingSoon) {
       shopItem.classList.add("not-available");
     }
 
