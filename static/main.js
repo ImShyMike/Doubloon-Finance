@@ -9,9 +9,11 @@ const averageHourlyRateDisplay = document.getElementById("averageHourlyRate");
 const shopContainer = document.getElementById("shopContainer");
 const locationFilter = document.getElementById("locationFilter");
 const goalName = document.getElementById("goalName");
+const canBuyGoal = document.getElementById("canBuyGoal");
 const doubloonsLeft = document.getElementById("doubloonsLeft");
 const timeLeft = document.getElementById("timeLeft");
 const scrollToTop = document.getElementById("scrollToTop");
+const goalImage = document.getElementById("goalImage");
 
 let totalEarnings = 0;
 let totalHours = 0;
@@ -56,6 +58,9 @@ async function loadShopData() {
     return item;
   });
 
+  // Restore the previous location
+  restoreFilter();
+
   // Render the shop data
   renderShop(shopData);
   
@@ -79,8 +84,8 @@ function renderShop(data) {
       price = item.priceGlobal;
     }
 
-    let minTime = Number(item.minimumHoursEstimated).toFixed(0).toString();
-    let maxTime = Number(item.maximumHoursEstimated).toFixed(0).toString();
+    let minTime = Number(item.minimumHoursEstimated).toFixed(0);
+    let maxTime = Number(item.maximumHoursEstimated).toFixed(0);
 
     let subtitle = "";
     if (item.subtitle) {
@@ -153,6 +158,17 @@ function handleSelection(id) {
 }
 
 function updateGoalContainer(id) {
+    if (id === "None") {
+      goalImage.src = ""
+      goalName.innerHTML = 'None (<img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">)'
+      doubloonsLeft.innerHTML = 'Doubloons until goal: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">'
+      timeLeft.innerHTML = 'Estimated hours left: 0'
+      canBuyGoal.innerHTML = 'No (0%)'
+      canBuyGoal.classList.add("red")
+      canBuyGoal.classList.remove("green")
+      return;
+    }
+
     // Update the goal container
     let item = getItemById(id);
     let price = 0;
@@ -171,6 +187,27 @@ function updateGoalContainer(id) {
     const averageHourlyRate = totalHours > 0 ? (totalEarnings / totalHours) : 0;
     const estimatedHours = averageHourlyRate > 0 ? ((price - totalEarnings) / averageHourlyRate) : 0;
     timeLeft.innerHTML = `Estimated hours left: ${estimatedHours > 0 ? estimatedHours.toFixed(2) : 0}`;
+
+    // Calculate if goal can be bought (if yes, how many times)
+    const buyAmount = totalEarnings / price;
+    const remainingToNext = price - (totalEarnings % price);
+    const remainingPercentage = 100 - (remainingToNext / price) * 100;
+    if (buyAmount >= 1) {
+      if (remainingPercentage > 0 && remainingPercentage !== 100) {
+        canBuyGoal.textContent = `${buyAmount.toFixed(0)} (+${remainingPercentage.toFixed(0)}%)`;
+      } else {
+        canBuyGoal.textContent = `${buyAmount.toFixed(0)}`;
+      }
+      canBuyGoal.classList.add("green")
+      canBuyGoal.classList.remove("red")
+    } else {
+      canBuyGoal.textContent = `No (${(buyAmount * 100).toFixed(0)}%)`;
+      canBuyGoal.classList.add("red")
+      canBuyGoal.classList.remove("green")
+    }
+
+    // Set the image to the item's image
+    goalImage.src = item.imageUrl;
 }
 
 // Restore selection from localStorage on page load
@@ -192,9 +229,19 @@ function restoreSelection() {
   }
 }
 
+// Restore the shop filter
+function restoreFilter() {
+  const selectedFilter = localStorage.getItem("filter");
+  if (selectedFilter && locations.includes(selectedFilter)) {
+    locationFilter.value = selectedFilter;
+  }
+}
+
 // Filter shop items based on location
 function filterShop() {
   const selectedLocation = locationFilter.value;
+  localStorage.setItem("filter", selectedLocation);
+  updateGoalContainer("None");
 
   if (selectedLocation === "") {
     // No filter, show all
@@ -219,7 +266,7 @@ function addProjectToList(name, earnings, hours) {
   projectInfo.classList.add("project-info");
   projectInfo.innerHTML = `
       <strong>${name}</strong>
-      <span>Earnings: ${earnings} doubloons</span>
+      <span>Earnings: ${earnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></span>
       <span>Hours: ${hours}</span>
       <span>Doubloons/Hour: ${hourlyRate}</span>
   `;

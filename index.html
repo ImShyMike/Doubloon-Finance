@@ -28,7 +28,7 @@
         <h1 id="title">Doubloon Finance</h1>
     </header>
     <main>
-        <div id="projectsContainer" class="projects-container">
+        <div id="projectsContainer" class="container">
             <h2>Projects and Earnings</h2>
             <form id="projectForm" class="project-form">
                 <input type="text" id="projectName" placeholder="Project Name" required>
@@ -44,11 +44,13 @@
             <p id="averageHourlyRate" class="info">Average Hourly Rate: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour</p>
         </div>
         
-        <div id="goalContainer" class="projects-container">
+        <div id="goalContainer" class="container">
             <h2>Goal</h2>
+            <img src="" alt="Goal Image" id="goalImage">
             <p id="goalName" class="info">None (0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">)</p>
             <p id="doubloonsLeft" class="info">Doubloons until goal: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></p>
             <p id="timeLeft" class="info">Estimated hours left: 0</p>
+            <p style="display:inline;">Can buy: </p><p style="display:inline;" id="canBuyGoal">No (0%)</p>
         </div>
 
         <div class="filter-container">

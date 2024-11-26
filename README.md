@@ -1,4 +1,6 @@
-# Doubloon-Finance
+[![Project Thumbnail](/assets/thumbnail-small.png)](https://shymike.is-a.dev/doubloon-finance/)
+
+# [Doubloon-Finance](https://shymike.is-a.dev/doubloon-finance/)
  Website to keep track your HackClub HighSeas earnings and know how much you still need for a certain prize.
 
 ## Notice

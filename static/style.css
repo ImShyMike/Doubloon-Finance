@@ -150,11 +150,14 @@ button:hover {
 }
 
 .not-available:hover {
-    border: 2px solid var(--red);
     cursor: not-allowed;
 }
 
-.projects-container {
+.not-available {
+    border: 2px solid var(--red);
+}
+
+.container {
     margin-bottom: 20px;
     padding: 20px;
     border: 2px solid var(--surface2);
@@ -166,7 +169,7 @@ button:hover {
     margin: 0 auto 20px;
 }
 
-.projects-container h2 {
+.container h2 {
     color: var(--yellow);
 }
 
@@ -342,4 +345,18 @@ button:hover {
 #scrollToTop:hover {
     transform: scale(1.1);
     background-color: var(--teal);
+}
+
+.red {
+    color: var(--red);
+}
+
+.green {
+    color: var(--green);
+}
+
+#goalImage {
+    width: 140px;
+    height: auto;
+    float: right;
 }
