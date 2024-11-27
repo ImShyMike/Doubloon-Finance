@@ -731,7 +731,7 @@
          "priceUs":790,
          "priceGlobal":790,
          "fulfilledAtEnd":false,
-         "comingSoon":true,
+         "comingSoon":false,
          "outOfStock":false,
          "minimumHoursEstimated":31.349999999999994,
          "maximumHoursEstimated":156.74999999999997
@@ -839,7 +839,7 @@
          "enabledUs":true,
          "enabledEu":true,
          "enabledIn":true,
-         "enabledXx":false,
+         "enabledXx":true,
          "enabledCa":true,
          "enabledAll":true,
          "priceUs":2090,
