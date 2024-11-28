@@ -34,7 +34,8 @@
                 <input type="text" id="projectName" placeholder="Project Name" required>
                 <input type="number" id="projectEarnings" placeholder="Earnings" required>
                 <input type="number" step="0.01" id="projectHours" placeholder="Hours Spent" required>
-                <button type="submit">Add Project</button>
+                <input type="checkbox" id="isBlessed">
+                <button type="submit" id="submitButton">Add Project</button>
             </form>
 
             <ul id="projectsList" class="projects-list"></ul>
@@ -46,7 +47,7 @@
         
         <div id="goalContainer" class="container">
             <h2>Goal</h2>
-            <img src="" alt="Goal Image" id="goalImage">
+            <img src="" alt="" id="goalImage">
             <p id="goalName" class="info">None (0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">)</p>
             <p id="doubloonsLeft" class="info">Doubloons until goal: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></p>
             <p id="timeLeft" class="info">Estimated hours left: 0</p>

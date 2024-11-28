@@ -188,6 +188,25 @@ button:hover {
     font-size: 14px;
 }
 
+#projectName {
+    flex: 2;
+    min-width: 250px !important;
+}
+
+#isBlessed {
+    min-width: 40px !important;
+    min-height: 40px;
+    background-color: var(--yellow);
+}
+
+#isBlessed:checked ~ button {
+    background-color: var(--yellow);
+}
+
+#isBlessed:checked ~ button:hover {
+    background-color: var(--flamingo);
+}
+
 #projectForm button {
     background-color: var(--blue);
     color: var(--crust);
@@ -258,6 +277,21 @@ button:hover {
     background-color: var(--mauve);
 }
 
+.project-edit-btn {
+    background-color: var(--teal);
+    color: var(--crust);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.project-edit-btn:hover {
+    background-color: var(--sky);
+}
+
 .info {
     line-height: 0.1;
     display: flex;
@@ -274,7 +308,7 @@ button:hover {
 
 .project-form input {
     flex: 1 1 100%;
-    min-width: 200px;
+    min-width: 100px;
     padding: 12px;
     font-size: 1rem;
     border: 2px solid var(--surface2);
@@ -317,6 +351,14 @@ button:hover {
     .project-form input, 
     .project-form button {
         flex: 1 1 100%;
+    }   
+}
+
+/* Media queries for small screens */
+@media (max-width: 620px) {
+    #goalImage {
+        display: block;
+        float: none !important;
     }
 }
 
@@ -359,4 +401,14 @@ button:hover {
     width: 140px;
     height: auto;
     float: right;
+}
+
+.blessedProject .projectNameInfo {
+    color: var(--rosewater) !important;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }

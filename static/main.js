@@ -14,6 +14,8 @@ const doubloonsLeft = document.getElementById("doubloonsLeft");
 const timeLeft = document.getElementById("timeLeft");
 const scrollToTop = document.getElementById("scrollToTop");
 const goalImage = document.getElementById("goalImage");
+const isBlessed = document.getElementById("isBlessed");
+const submitButton = document.getElementById("submitButton");
 
 let totalEarnings = 0;
 let totalHours = 0;
@@ -78,21 +80,11 @@ function renderShop(data) {
     shopItem.className = "shop-item";
     shopItem.dataset.id = item.id;
 
-    let price = 0;
-    if (item.enabledUs === true) {
-      price = item.priceUs;
-    } else {
-      price = item.priceGlobal;
-    }
-
-    let minTime = Number(item.minimumHoursEstimated).toFixed(0);
-    let maxTime = Number(item.maximumHoursEstimated).toFixed(0);
-
-    let subtitle = "";
-    if (item.subtitle) {
-      subtitle = item.subtitle;
-    }
-
+    let price = item.enabledUs === true ? item.priceUs : item.priceGlobal;
+    let minTime = item.minimumHoursEstimated.toFixed(0);
+    let maxTime = item.maximumHoursEstimated.toFixed(0);
+    let subtitle = item.subtitle ? item.subtitle : "";
+  
     shopItem.innerHTML = `
       <h3>${item.name}</h3>
       <p><img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"> ${price} (${minTime}-${maxTime} hours)</p>
@@ -113,8 +105,7 @@ function renderShop(data) {
 }
 
 function getItemById(id) {
-  const item = shopData.find((item) => item.id === id);
-  return item;
+  return shopData.find((item) => item.id === id);
 }
 
 // Handle card selection
@@ -152,9 +143,7 @@ function handleSelection(id) {
   updateGoalContainer(id);
 
   // Save the selected item's data to localStorage
-  const itemData = {
-    id,
-  };
+  const itemData = { id };
   localStorage.setItem("selectedItem", JSON.stringify(itemData));
 }
 
@@ -258,57 +247,117 @@ function filterShop() {
 }
 
 // Add project to the list
-function addProjectToList(name, earnings, hours) {
+function addProjectToList(name, earnings, hours, blessed) {
   const hourlyRate = (earnings / hours).toFixed(2);
+  const unblessedRate = ((earnings - earnings / 1.2) / hours).toFixed(2);
 
   const projectItem = document.createElement("li");
 
   const projectInfo = document.createElement("div");
   projectInfo.classList.add("project-info");
   projectInfo.innerHTML = `
-      <strong>${name}</strong>
-      <span>Earnings: ${earnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></span>
+      <strong class="projectNameInfo">${(blessed && !name.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' : ''}${name}</strong>
+      <span>Earnings: ${earnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ''}</span>
       <span>Hours: ${hours}</span>
-      <span>Doubloons/Hour: ${hourlyRate}</span>
+      <span>Doubloons/Hour: ${hourlyRate} ${blessed ? ` (+${unblessedRate})` : ''}</span>
   `;
+
+  const editButton = document.createElement("button");
+  editButton.classList.add("project-edit-btn");
+  editButton.textContent = "Edit";
+  editButton.addEventListener("click", () => {
+    if (editButton.textContent === "Exit") {
+      // Clear inputs
+      projectNameInput.value = "";
+      projectEarningsInput.value = "";
+      projectHoursInput.value = "";
+      isBlessed.checked = false;
+      editButton.textContent = "Edit";
+      submitButton.textContent = "Add Project";
+      delete editingItem.dataset.editing;
+      delete editingItem.dataset.name;
+      return;
+    }
+
+    // Populate inputs with current project data for editing
+    projectNameInput.value = name;
+    projectEarningsInput.value = earnings;
+    projectHoursInput.value = hours;
+    isBlessed.checked = editButton.parentElement.parentElement.classList.contains("blessedProject");
+    // Store the project item for later replacement
+    projectItem.dataset.editing = true; // Mark this item as being edited
+    projectItem.dataset.name = name; // Store the name for later use
+    // Change the add button to "Save"
+    submitButton.textContent = "Save";
+    // Change own button to "Exit"
+    editButton.textContent = "Exit";
+  });
 
   const removeButton = document.createElement("button");
   removeButton.classList.add("project-remove-btn");
   removeButton.textContent = "Remove";
   removeButton.addEventListener("click", () => {
-      projectItem.remove();
-      totalEarnings -= earnings;
-      totalHours -= hours;
-      updateTotals();
-      saveProjectsToLocalStorage();
-      if (selectedItemId) {
-        handleSelection(selectedItemId)
-      }
+    projectItem.remove();
+    totalEarnings -= earnings;
+    totalHours -= hours;
+    updateTotals();
+    saveProjectsToLocalStorage();
+    if (selectedItemId) {
+        handleSelection(selectedItemId);
+    }
+    // If was being edited, reset state
+    projectNameInput.value = "";
+    projectEarningsInput.value = "";
+    projectHoursInput.value = "";
+    isBlessed.checked = false;
+    const editButton = removeButton.parentElement.getElementsByClassName("project-edit-btn")[0];
+    editButton.textContent = "Edit";
+    submitButton.textContent = "Add Project";
+    if (editingItem) {
+      delete editingItem.dataset.editing;
+      delete editingItem.dataset.name;
+    }
   });
 
+  // Append buttons to the project item
+  const buttonContainer = document.createElement("div");
+  buttonContainer.classList.add("button-container");
+  buttonContainer.appendChild(editButton);
+  buttonContainer.appendChild(removeButton);
   projectItem.appendChild(projectInfo);
-  projectItem.appendChild(removeButton);
+  projectItem.appendChild(buttonContainer);
   projectsList.appendChild(projectItem);
+  projectItem.classList.toggle("blessedProject", !!blessed);
 }
 
 // Update totals display
 function updateTotals() {
   const averageHourlyRate = totalHours > 0 ? (totalEarnings / totalHours).toFixed(2) : 0;
 
-  totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">`;
-  totalHoursDisplay.innerHTML = `Total Hours: ${totalHours}`;
-  averageHourlyRateDisplay.innerHTML = `Average Hourly Rate: ${averageHourlyRate} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour`;
+  // Calculate blessed earnings and blessed hours
+  const blessedProjects = [...projectsList.children].filter(item => item.classList.contains("blessedProject"));
+  const blessedEarnings = blessedProjects.reduce((sum, item) => {
+    const earnings = parseFloat(item.querySelector("span").textContent.match(/([\d.]+)/)[0]);
+    return sum + (earnings - earnings / 1.2);
+  }, 0);
+
+  const blessedAverageHours = (blessedEarnings / totalHours).toFixed(2)
+
+  totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
+  totalHoursDisplay.innerHTML = `Total Hours: ${totalHours.toFixed(2)}`;
+  averageHourlyRateDisplay.innerHTML = `Average Hourly Rate: ${averageHourlyRate} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
 }
 
 // Save projects and totals to localStorage
 function saveProjectsToLocalStorage() {
   const projectItems = [...projectsList.children].map((item) => {
       const projectInfo = item.querySelector(".project-info");
-      const name = projectInfo.querySelector("strong").textContent;
+      const name = projectInfo.querySelector("strong").textContent.replace('🏴‍☠️ ', '');
+      const blessed = !!(item.classList.contains("blessedProject"));
       const [earnings, hours] = [...projectInfo.querySelectorAll("span")]
           .map(span => parseFloat(span.textContent.match(/([\d.]+)/)[0]));
 
-      return { name, earnings, hours };
+      return { name, earnings, hours, blessed };
   });
 
   localStorage.setItem("projects", JSON.stringify(projectItems));
@@ -328,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
   totalHours = parseFloat(localStorage.getItem("totalHours")) || 0;
 
   // Restore saved projects
-  savedProjects.forEach((project) => addProjectToList(project.name, project.earnings, project.hours));
+  savedProjects.forEach((project) => addProjectToList(project.name, project.earnings, project.hours, project.blessed));
 
   // Restore totals
   updateTotals();
@@ -349,26 +398,52 @@ projectForm.addEventListener("submit", (e) => {
   const projectName = projectNameInput.value.trim();
   const projectEarnings = parseFloat(projectEarningsInput.value);
   const projectHours = parseFloat(projectHoursInput.value);
+  const blessed = !!isBlessed.checked;
 
-  if (projectName && !isNaN(projectEarnings) && !isNaN(projectHours)) {
-      // Add project to the list
-      addProjectToList(projectName, projectEarnings, projectHours);
+    if (projectName && !isNaN(projectEarnings) && !isNaN(projectHours)) {
+        // Check if editing an existing project
+        const editingItem = [...projectsList.children].find(item => item.dataset.editing);
+        if (editingItem) {
+            // Update the existing project
+            editingItem.querySelector(".projectNameInfo").textContent = (blessed && !projectName.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' + projectName : projectName;
+            const spans = editingItem.querySelectorAll("span");
+            spans[0].innerHTML = `Earnings: ${projectEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
+            spans[1].textContent = `Hours: ${projectHours}`;
+            spans[2].textContent = `Doubloons/Hour: ${(projectEarnings / projectHours).toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ''}`;
 
-      // Update totals
-      totalEarnings += projectEarnings;
-      totalHours += projectHours;
-      updateTotals();
+            // Update blessed state
+            editingItem.classList.toggle("blessedProject", blessed);
 
-      // Save to localStorage
-      saveProjectsToLocalStorage();
+            totalEarnings -= projectEarnings;
+            totalHours -= projectHours;
 
-      // Clear inputs
-      projectNameInput.value = "";
-      projectEarningsInput.value = "";
-      projectHoursInput.value = "";
+            // Remove editing marker
+            delete editingItem.dataset.editing;
+            delete editingItem.dataset.name;
 
-      if (selectedItemId) {
-        handleSelection(selectedItemId)
-      }
-  }
+            // Restore submit button text
+            submitButton.textContent = "Add Project";
+        } else {
+            // Add project to the list
+            addProjectToList(projectName, projectEarnings, projectHours, !!blessed);
+        }
+
+        // Update totals
+        totalEarnings += projectEarnings;
+        totalHours += projectHours;
+        updateTotals();
+
+        // Save to localStorage
+        saveProjectsToLocalStorage();
+
+        // Clear inputs
+        projectNameInput.value = "";
+        projectEarningsInput.value = "";
+        projectHoursInput.value = "";
+        isBlessed.checked = false;
+
+        if (selectedItemId) {
+            handleSelection(selectedItemId);
+        }
+    }
 });
