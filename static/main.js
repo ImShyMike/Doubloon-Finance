@@ -288,10 +288,12 @@ function addProjectToList(name, earnings, hours, blessed) {
 
     // Populate inputs with current project data for editing
     const project = editButton.parentElement.parentElement;
-    projectNameInput.value = project.querySelector('.projectNameInfo').textContent;
+    let isBlessed = project.classList.contains("blessedProject");
+    let projectName = project.querySelector('.projectNameInfo').textContent;
+    projectNameInput.value = isBlessed ? projectName : projectName.replace("🏴‍☠️ ", "");
     projectEarningsInput.value = project.querySelector('span:nth-child(2)').textContent.split(' ')[1];
     projectHoursInput.value = project.querySelector('span:nth-child(3)').textContent.split(' ')[1];
-    isBlessed.checked = project.classList.contains("blessedProject");
+    isBlessed.checked = isBlessed;
     // Store the project item for later replacement
     projectItem.dataset.editing = true; // Mark this item as being edited
     // Change the add button to "Save"
