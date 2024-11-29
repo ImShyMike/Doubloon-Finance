@@ -288,12 +288,10 @@ function addProjectToList(name, earnings, hours, blessed) {
 
     // Populate inputs with current project data for editing
     const project = editButton.parentElement.parentElement;
-    let isBlessed = project.classList.contains("blessedProject");
-    let projectName = project.querySelector('.projectNameInfo').textContent;
-    projectNameInput.value = isBlessed ? projectName : projectName.replace("🏴‍☠️ ", "");
+    projectNameInput.value = project.querySelector('.projectNameInfo').textContent;
     projectEarningsInput.value = project.querySelector('span:nth-child(2)').textContent.split(' ')[1];
     projectHoursInput.value = project.querySelector('span:nth-child(3)').textContent.split(' ')[1];
-    isBlessed.checked = isBlessed;
+    isBlessed.checked = project.classList.contains("blessedProject");
     // Store the project item for later replacement
     projectItem.dataset.editing = true; // Mark this item as being edited
     // Change the add button to "Save"
@@ -423,7 +421,7 @@ window.addEventListener("scroll", () => {
 projectForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const projectName = projectNameInput.value.trim();
+  const projectName = projectNameInput.value.replace('🏴‍☠️ ', '').trim();
   const projectEarnings = parseFloat(projectEarningsInput.value);
   const projectHours = parseFloat(projectHoursInput.value);
   const blessed = !!isBlessed.checked;
@@ -433,7 +431,7 @@ projectForm.addEventListener("submit", (e) => {
       const editingItem = [...projectsList.children].find(item => item.dataset.editing);
       if (editingItem) {
           // Update the existing project
-          editingItem.querySelector(".projectNameInfo").textContent = (blessed && !projectName.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' + projectName : projectName;
+          editingItem.querySelector(".projectNameInfo").textContent = blessed ? '🏴‍☠️ ' + projectName : projectName;
           const spans = editingItem.querySelectorAll("span");
           spans[0].innerHTML = `Earnings: ${projectEarnings} ${doubloonImage}${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
           spans[1].textContent = `Hours: ${projectHours}`;
