@@ -16,7 +16,6 @@
 
 ### Input field:
 ![Usage Input](assets/usage.png)
-#### Image explanation:
 - Project name
 - Doubloons earned
 - Hours spent
@@ -24,7 +23,6 @@
 
 ### Project list:
 ![Usage Project](assets/usage2.png)
-#### Image explanation:
 - Project name (flag and color means its blessed)
 - Doubloons earned
 - Hours spent
