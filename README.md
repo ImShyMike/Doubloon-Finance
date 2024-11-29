@@ -13,7 +13,7 @@
 - Editing/deleting existing tracked projects
 
 ## Usage
-![Usage](assets/usage.png)
+![Usage Input](assets/usage.png)
 #### Image explanation:
 - Project name
 - Doubloons earned
@@ -25,9 +25,8 @@
 - Project name (flag and color means its blessed)
 - Doubloons earned
 - Hours spent
-- Was the project blessed?
 
-(values in brackets mean are much the blessing changed the original values)
+(values in brackets show much the blessing changed the original values)
  
 ## Notice
 The doubloons and prize images are directly from [HighSeas](https://highseas.hackclub.com/), which has it's own [repository](https://github.com/hackclub/high-seas).
