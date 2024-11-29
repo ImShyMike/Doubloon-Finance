@@ -29,7 +29,7 @@ let filteredData = [];
 let selectedItemId = null; // Track the selected item ID
 
 const doubloonUrl = "https://raw.githubusercontent.com/hackclub/high-seas/refs/heads/main/public/doubloon.svg";
-const doubloonImage = `<img src="${doubloonUrl}" alt="doubloons" width="20" height="20" class="doubloon">`
+const doubloonImage = `<img src="${doubloonUrl}" alt="doubloons" width="20" height="20" draggable="false" class="doubloon">`
 
 const textEncoder = new TextEncoder();
 
@@ -97,7 +97,7 @@ function renderShop(data) {
       <h3>${item.name}</h3>
       <p>${doubloonImage} ${price} (${minTime}-${maxTime} hours)</p>
       <p>${subtitle}</p>
-      <img src="${item.imageUrl}" alt="${item.name}" class="shop-item-image" loading="lazy"/>
+      <img src="${item.imageUrl}" alt="${item.name}" class="shop-item-image" draggable="false" loading="lazy"/>
     `;
 
     shopItem.item = item;
@@ -210,16 +210,16 @@ function updateGoalContainer(id) {
 
 // Restore selection from localStorage on page load
 function restoreSelection() {
-  const selectedItemObj = JSON.parse(localStorage.getItem("selectedItem"));
-  if (selectedItemObj && selectedItemObj.id) {
-    // Find the saved item in the DOM and apply the selected class
-    const savedItem = document.querySelector(
-      `.shop-item[data-id="${selectedItemObj.id}"]`
-    );
+  if (!selectedItemId) {
+    const selectedItemObj = JSON.parse(localStorage.getItem("selectedItem"));
+    selectedItemId = selectedItemObj?.id || null;
+  }
 
+  if (selectedItemId) {
+    const savedItem = document.querySelector(`.shop-item[data-id="${selectedItemId}"]`);
     if (savedItem) {
       savedItem.classList.add("selected");
-      selectedItemId = selectedItemObj.id;
+      handleSelection(savedItem.id);
       updateGoalContainer(selectedItemId);
     } else {
       console.warn("Selected item from storage not found in DOM.");
@@ -389,17 +389,24 @@ locationFilter.addEventListener("change", filterShop);
 
 // Load shop data on page load
 document.addEventListener("DOMContentLoaded", () => {
-  loadShopData();
+  loadShopData().then(() => {
+    // Restore the filter
+    restoreFilter();
 
-  const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-  totalEarnings = parseFloat(localStorage.getItem("totalEarnings")) || 0;
-  totalHours = parseFloat(localStorage.getItem("totalHours")) || 0;
+    // Restore saved projects
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    savedProjects.forEach((project) => addProjectToList(project.name, project.earnings, project.hours, project.blessed));
 
-  // Restore saved projects
-  savedProjects.forEach((project) => addProjectToList(project.name, project.earnings, project.hours, project.blessed));
+    // Restore selected item
+    restoreSelection();
 
-  // Restore totals
-  updateTotals();
+    // Update totals
+    updateTotals();
+
+    if (selectedItemId) {
+      handleSelection(selectedItemId);
+    }
+  });
 });
 
 window.addEventListener("scroll", () => {
@@ -464,51 +471,52 @@ projectForm.addEventListener("submit", (e) => {
   }
 });
 
-importButton.addEventListener("click", (e) => {
-  e.preventDefault();
-
-  const b64String = prompt("Paste text here:")
-
+importButton.addEventListener("click", () => {
+  const b64String = prompt("Paste text here:");
   const binaryString = atob(b64String);
   const decodedData = new Uint8Array(
-    binaryString.split("").map(char => char.charCodeAt(0))
+    binaryString.split("").map((char) => char.charCodeAt(0))
   );
   const textDecoder = new TextDecoder();
   const jsonString = textDecoder.decode(decodedData);
-
   const importedData = JSON.parse(jsonString);
 
-  const filterTemp = importedData.filter;
-  const projectsTemp = importedData.projects;
-  const selectedItemTemp = importedData.selectedItem;
+  const { filter, projects, selectedItem } = importedData;
 
-  if (filterTemp && projectsTemp && selectedItemTemp) {
-    locationFilter.value = filterTemp;
-    selectedItemId = selectedItemTemp;
+  if (filter && projects && selectedItem) {
+    // Apply location filter
+    locationFilter.value = filter;
 
-    // Load the projects from the imported data
+    // Clear existing projects
     projectsList.innerHTML = "";
-    projectsTemp.forEach(project => {
+
+    // Add imported projects
+    projects.forEach((project) => {
       addProjectToList(project.name, project.earnings, project.hours, project.blessed);
     });
 
-    // Restore selection after shop data is loaded
-    restoreSelection();
     filterShop();
 
+    // Update the selected item
+    selectedItemId = selectedItem;
+    localStorage.setItem("selectedItem", JSON.stringify({ id: selectedItemId }));
+
+    handleSelection(selectedItemId);
+
+    // Update goal container
+    updateGoalContainer(selectedItemId);
+
+    // Update totals
     updateTotals();
+
+    // Save imported state to localStorage
     saveProjectsToLocalStorage();
-    if (selectedItemId) {
-      handleSelection(selectedItemId);
-    }
   } else {
     alert("Invalid data, could not import!");
   }
 });
 
-exportButton.addEventListener("click", (e) => {
-  e.preventDefault();
-
+exportButton.addEventListener("click", () => {
   const projects = [...projectsList.children].map((item) => {
     const projectInfo = item.querySelector(".project-info");
     const name = projectInfo.querySelector("strong").textContent.replace('🏴‍☠️ ', '');
