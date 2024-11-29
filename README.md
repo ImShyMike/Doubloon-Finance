@@ -13,6 +13,8 @@
 - Editing/deleting existing tracked projects
 
 ## Usage
+
+### Input field:
 ![Usage Input](assets/usage.png)
 #### Image explanation:
 - Project name
@@ -20,6 +22,7 @@
 - Hours spent
 - Was the project blessed?
 
+### Project list:
 ![Usage Project](assets/usage2.png)
 #### Image explanation:
 - Project name (flag and color means its blessed)
