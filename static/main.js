@@ -511,6 +511,9 @@ importButton.addEventListener("click", () => {
 
     // Save imported state to localStorage
     saveProjectsToLocalStorage();
+
+    // Reselect to calculate goal data
+    handleSelection(selectedItemId);
   } else {
     alert("Invalid data, could not import!");
   }
