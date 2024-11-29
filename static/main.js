@@ -16,6 +16,8 @@ const scrollToTop = document.getElementById("scrollToTop");
 const goalImage = document.getElementById("goalImage");
 const isBlessed = document.getElementById("isBlessed");
 const submitButton = document.getElementById("submitButton");
+const importButton = document.getElementById("importButton");
+const exportButton = document.getElementById("exportButton");
 
 let totalEarnings = 0;
 let totalHours = 0;
@@ -25,6 +27,8 @@ const locations = ["Us", "Eu", "In", "Xx", "Ca", "All"];
 let shopData = [];
 let filteredData = [];
 let selectedItemId = null; // Track the selected item ID
+
+const textEncoder = new TextEncoder();
 
 // Fetch JSON from a URL
 async function fetchJSON(url) {
@@ -63,12 +67,13 @@ async function loadShopData() {
   // Render the shop data
   renderShop(shopData);
   
-  // Restore selection after shop data is loaded
-  restoreSelection();
-
   // Restore the previous location
   restoreFilter();
-  filterShop()
+
+  // Restore selection after shop data is loaded
+  restoreSelection();
+  
+  filterShop();
 }
 
 // Render the shop data
@@ -275,18 +280,17 @@ function addProjectToList(name, earnings, hours, blessed) {
       editButton.textContent = "Edit";
       submitButton.textContent = "Add Project";
       delete editingItem.dataset.editing;
-      delete editingItem.dataset.name;
       return;
     }
 
     // Populate inputs with current project data for editing
-    projectNameInput.value = name;
-    projectEarningsInput.value = earnings;
-    projectHoursInput.value = hours;
-    isBlessed.checked = editButton.parentElement.parentElement.classList.contains("blessedProject");
+    const project = editButton.parentElement.parentElement;
+    projectNameInput.value = project.querySelector('.projectNameInfo').textContent;
+    projectEarningsInput.value = project.querySelector('span:nth-child(2)').textContent.split(' ')[1];
+    projectHoursInput.value = project.querySelector('span:nth-child(3)').textContent.split(' ')[1];
+    isBlessed.checked = project.classList.contains("blessedProject");
     // Store the project item for later replacement
     projectItem.dataset.editing = true; // Mark this item as being edited
-    projectItem.dataset.name = name; // Store the name for later use
     // Change the add button to "Save"
     submitButton.textContent = "Save";
     // Change own button to "Exit"
@@ -306,22 +310,18 @@ function addProjectToList(name, earnings, hours, blessed) {
         handleSelection(selectedItemId);
     }
     // If was being edited, reset state
+    const projectButtonContainer = removeButton.parentElement;
     projectNameInput.value = "";
     projectEarningsInput.value = "";
     projectHoursInput.value = "";
     isBlessed.checked = false;
-    const editButton = removeButton.parentElement.getElementsByClassName("project-edit-btn")[0];
-    editButton.textContent = "Edit";
+    projectButtonContainer.getElementsByClassName("project-edit-btn")[0].textContent = "Edit";
     submitButton.textContent = "Add Project";
-    if (editingItem) {
-      delete editingItem.dataset.editing;
-      delete editingItem.dataset.name;
-    }
   });
 
   // Append buttons to the project item
   const buttonContainer = document.createElement("div");
-  buttonContainer.classList.add("button-container");
+  buttonContainer.classList.add("project-button-container");
   buttonContainer.appendChild(editButton);
   buttonContainer.appendChild(removeButton);
   projectItem.appendChild(projectInfo);
@@ -330,8 +330,26 @@ function addProjectToList(name, earnings, hours, blessed) {
   projectItem.classList.toggle("blessedProject", !!blessed);
 }
 
+// Calculate total hours
+function calculateTotalHours() {
+  totalHours = [...projectsList.children].reduce((sum, item) => {
+    const hours = parseFloat(item.querySelector("span:nth-child(3)").textContent.match(/([\d.]+)/)[0]);
+    return sum + (isNaN(hours) ? 0 : hours);
+  }, 0);
+}
+
+// Calculate total earnings
+function calculateTotalEarnings() {
+  totalEarnings = [...projectsList.children].reduce((sum, item) => {
+    const earnings = parseFloat(item.querySelector("span").textContent.match(/([\d.]+)/)[0]);
+    return sum + (isNaN(earnings) ? 0 : earnings);
+  }, 0);
+}
+
 // Update totals display
 function updateTotals() {
+  calculateTotalEarnings(); // Calculate total earnings
+  calculateTotalHours(); // Calculate total hours
   const averageHourlyRate = totalHours > 0 ? (totalEarnings / totalHours).toFixed(2) : 0;
 
   // Calculate blessed earnings and blessed hours
@@ -345,7 +363,7 @@ function updateTotals() {
 
   totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
   totalHoursDisplay.innerHTML = `Total Hours: ${totalHours.toFixed(2)}`;
-  averageHourlyRateDisplay.innerHTML = `Average Hourly Rate: ${averageHourlyRate} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
+  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${averageHourlyRate} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
 }
 
 // Save projects and totals to localStorage
@@ -361,8 +379,6 @@ function saveProjectsToLocalStorage() {
   });
 
   localStorage.setItem("projects", JSON.stringify(projectItems));
-  localStorage.setItem("totalEarnings", totalEarnings.toString());
-  localStorage.setItem("totalHours", totalHours.toString());
 }
 
 // Attach filter event
@@ -400,50 +416,114 @@ projectForm.addEventListener("submit", (e) => {
   const projectHours = parseFloat(projectHoursInput.value);
   const blessed = !!isBlessed.checked;
 
-    if (projectName && !isNaN(projectEarnings) && !isNaN(projectHours)) {
-        // Check if editing an existing project
-        const editingItem = [...projectsList.children].find(item => item.dataset.editing);
-        if (editingItem) {
-            // Update the existing project
-            editingItem.querySelector(".projectNameInfo").textContent = (blessed && !projectName.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' + projectName : projectName;
-            const spans = editingItem.querySelectorAll("span");
-            spans[0].innerHTML = `Earnings: ${projectEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
-            spans[1].textContent = `Hours: ${projectHours}`;
-            spans[2].textContent = `Doubloons/Hour: ${(projectEarnings / projectHours).toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ''}`;
+  if (projectName && !isNaN(projectEarnings) && !isNaN(projectHours)) {
+      // Check if editing an existing project
+      const editingItem = [...projectsList.children].find(item => item.dataset.editing);
+      if (editingItem) {
+          // Update the existing project
+          editingItem.querySelector(".projectNameInfo").textContent = (blessed && !projectName.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' + projectName : projectName;
+          const spans = editingItem.querySelectorAll("span");
+          spans[0].innerHTML = `Earnings: ${projectEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
+          spans[1].textContent = `Hours: ${projectHours}`;
+          spans[2].textContent = `Doubloons/Hour: ${(projectEarnings / projectHours).toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ''}`;
 
-            // Update blessed state
-            editingItem.classList.toggle("blessedProject", blessed);
+          // Update blessed state
+          editingItem.classList.toggle("blessedProject", blessed);
 
-            totalEarnings -= projectEarnings;
-            totalHours -= projectHours;
+          // Set the exit button back to "Edit"
+          editingItem.getElementsByClassName("project-edit-btn")[0].textContent = "Edit"
 
-            // Remove editing marker
-            delete editingItem.dataset.editing;
-            delete editingItem.dataset.name;
+          // Remove editing marker
+          delete editingItem.dataset.editing;
 
-            // Restore submit button text
-            submitButton.textContent = "Add Project";
-        } else {
-            // Add project to the list
-            addProjectToList(projectName, projectEarnings, projectHours, !!blessed);
-        }
+          // Restore submit button text
+          submitButton.textContent = "Add Project";
+      } else {
+          // Add project to the list
+          addProjectToList(projectName, projectEarnings, projectHours, !!blessed);
+      }
 
-        // Update totals
-        totalEarnings += projectEarnings;
-        totalHours += projectHours;
-        updateTotals();
+      // Update totals
+      updateTotals(); // Update totals after adding or editing a project
 
-        // Save to localStorage
-        saveProjectsToLocalStorage();
+      // Save to localStorage
+      saveProjectsToLocalStorage();
 
-        // Clear inputs
-        projectNameInput.value = "";
-        projectEarningsInput.value = "";
-        projectHoursInput.value = "";
-        isBlessed.checked = false;
+      // Clear inputs
+      projectNameInput.value = "";
+      projectEarningsInput.value = "";
+      projectHoursInput.value = "";
+      isBlessed.checked = false;
 
-        if (selectedItemId) {
-            handleSelection(selectedItemId);
-        }
-    }
+      if (selectedItemId) {
+          handleSelection(selectedItemId);
+      }
+  }
 });
+
+importButton.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const b64String = prompt("Paste text here:")
+
+  const binaryString = atob(b64String);
+  const decodedData = new Uint8Array(
+    binaryString.split("").map(char => char.charCodeAt(0))
+  );
+  const textDecoder = new TextDecoder();
+  const jsonString = textDecoder.decode(decodedData);
+
+  const importedData = JSON.parse(jsonString);
+
+  const filterTemp = importedData.filter;
+  const projectsTemp = importedData.projects;
+  const selectedItemTemp = importedData.selectedItem;
+
+  if (filterTemp && projectsTemp && selectedItemTemp) {
+    locationFilter.value = filterTemp;
+    selectedItemId = selectedItemTemp;
+
+    // Load the projects from the imported data
+    projectsList.innerHTML = "";
+    projectsTemp.forEach(project => {
+      addProjectToList(project.name, project.earnings, project.hours, project.blessed);
+    });
+
+    // Restore selection after shop data is loaded
+    restoreSelection();
+    filterShop();
+
+    updateTotals();
+    saveProjectsToLocalStorage();
+    if (selectedItemId) {
+      handleSelection(selectedItemId);
+    }
+  } else {
+    alert("Invalid data, could not import!");
+  }
+});
+
+exportButton.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const projects = [...projectsList.children].map((item) => {
+    const projectInfo = item.querySelector(".project-info");
+    const name = projectInfo.querySelector("strong").textContent.replace('🏴‍☠️ ', '');
+    const blessed = !!(item.classList.contains("blessedProject"));
+    const [earnings, hours] = [...projectInfo.querySelectorAll("span")]
+        .map(span => parseFloat(span.textContent.match(/([\d.]+)/)[0]));
+
+    return { name, earnings, hours, blessed };
+  });
+
+  const jsonString = JSON.stringify({filter: locationFilter.value, projects, selectedItem: selectedItemId});
+  const encodedData = textEncoder.encode(jsonString);
+  const binaryString = Array.from(encodedData)
+    .map(byte => String.fromCharCode(byte))
+    .join("");
+  const b64String = btoa(binaryString);
+  navigator.clipboard.writeText(b64String);
+
+  alert("Data copied to clipboard!");
+})
+

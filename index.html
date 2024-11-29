@@ -29,20 +29,28 @@
     </header>
     <main>
         <div id="projectsContainer" class="container">
-            <h2>Projects and Earnings</h2>
+            <div id="projectsContainerTop">
+                <h2 id="projectsContainerTitle">Projects and Earnings</h2>
+                <div class="button-container">
+                    <button type="submit" class="customButton" id="importButton">Import</button>
+                    <button type="submit" class="customButton" id="exportButton">Export</button>
+                </div>
+            </div>
             <form id="projectForm" class="project-form">
                 <input type="text" id="projectName" placeholder="Project Name" required>
                 <input type="number" id="projectEarnings" placeholder="Earnings" required>
                 <input type="number" step="0.01" id="projectHours" placeholder="Hours Spent" required>
-                <input type="checkbox" id="isBlessed">
-                <button type="submit" id="submitButton">Add Project</button>
+                <div class="form-submit-container">
+                    <input type="checkbox" id="isBlessed">
+                    <button type="submit" id="submitButton">Add Project</button>
+                </div>
             </form>
 
             <ul id="projectsList" class="projects-list"></ul>
 
-            <p id="totalEarnings" class="info">Total Earnings: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></p>
+            <p id="totalEarnings" class="info">Total Earnings: 0<img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"></p>
             <p id="totalHours" class="info">Total Hours: 0</p>
-            <p id="averageHourlyRate" class="info">Average Hourly Rate: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour</p>
+            <p id="averageHourlyRate" class="info">Hourly Rate: 0<img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour</p>
         </div>
         
         <div id="goalContainer" class="container">
