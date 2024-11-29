@@ -28,6 +28,9 @@ let shopData = [];
 let filteredData = [];
 let selectedItemId = null; // Track the selected item ID
 
+const doubloonUrl = "https://raw.githubusercontent.com/hackclub/high-seas/refs/heads/main/public/doubloon.svg";
+const doubloonImage = `<img src="${doubloonUrl}" alt="doubloons" width="20" height="20" class="doubloon">`
+
 const textEncoder = new TextEncoder();
 
 // Fetch JSON from a URL
@@ -92,7 +95,7 @@ function renderShop(data) {
   
     shopItem.innerHTML = `
       <h3>${item.name}</h3>
-      <p><img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon"> ${price} (${minTime}-${maxTime} hours)</p>
+      <p>${doubloonImage} ${price} (${minTime}-${maxTime} hours)</p>
       <p>${subtitle}</p>
       <img src="${item.imageUrl}" alt="${item.name}" class="shop-item-image" loading="lazy"/>
     `;
@@ -155,8 +158,8 @@ function handleSelection(id) {
 function updateGoalContainer(id) {
     if (id === "None") {
       goalImage.src = ""
-      goalName.innerHTML = 'None (<img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">)'
-      doubloonsLeft.innerHTML = 'Doubloons until goal: 0 <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">'
+      goalName.innerHTML = `None (${doubloonImage})`
+      doubloonsLeft.innerHTML = `Doubloons until goal: 0 ${doubloonImage}`
       timeLeft.innerHTML = 'Estimated hours left: 0'
       canBuyGoal.innerHTML = 'No (0%)'
       canBuyGoal.classList.add("red")
@@ -172,11 +175,11 @@ function updateGoalContainer(id) {
     } else {
         price = item.priceGlobal;
     }
-    goalName.innerHTML = `${item.name} (${price} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">)`;
+    goalName.innerHTML = `${item.name} (${price} ${doubloonImage})`;
 
     // Calculate doubloons left until the goal
     const doubloonsNeeded = price - totalEarnings;
-    doubloonsLeft.innerHTML = `Doubloons until goal: ${doubloonsNeeded > 0 ? doubloonsNeeded : 0} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">`;
+    doubloonsLeft.innerHTML = `Doubloons until goal: ${doubloonsNeeded > 0 ? doubloonsNeeded : 0} ${doubloonImage}`;
 
     // Calculate estimated time left based on current doubloons and average hourly rate
     const averageHourlyRate = totalHours > 0 ? (totalEarnings / totalHours) : 0;
@@ -262,7 +265,7 @@ function addProjectToList(name, earnings, hours, blessed) {
   projectInfo.classList.add("project-info");
   projectInfo.innerHTML = `
       <strong class="projectNameInfo">${(blessed && !name.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' : ''}${name}</strong>
-      <span>Earnings: ${earnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ''}</span>
+      <span>Earnings: ${earnings} ${doubloonImage}${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ''}</span>
       <span>Hours: ${hours}</span>
       <span>Doubloons/Hour: ${hourlyRate} ${blessed ? ` (+${unblessedRate})` : ''}</span>
   `;
@@ -361,9 +364,9 @@ function updateTotals() {
 
   const blessedAverageHours = (blessedEarnings / totalHours).toFixed(2)
 
-  totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
+  totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} ${doubloonImage}${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
   totalHoursDisplay.innerHTML = `Total Hours: ${totalHours.toFixed(2)}`;
-  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${averageHourlyRate} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
+  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${averageHourlyRate} ${doubloonImage}/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
 }
 
 // Save projects and totals to localStorage
@@ -423,7 +426,7 @@ projectForm.addEventListener("submit", (e) => {
           // Update the existing project
           editingItem.querySelector(".projectNameInfo").textContent = (blessed && !projectName.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' + projectName : projectName;
           const spans = editingItem.querySelectorAll("span");
-          spans[0].innerHTML = `Earnings: ${projectEarnings} <img src="https://highseas.hackclub.com/doubloon.svg" alt="doubloons" width="20" height="20" class="doubloon">${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
+          spans[0].innerHTML = `Earnings: ${projectEarnings} ${doubloonImage}${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
           spans[1].textContent = `Hours: ${projectHours}`;
           spans[2].textContent = `Doubloons/Hour: ${(projectEarnings / projectHours).toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ''}`;
 
