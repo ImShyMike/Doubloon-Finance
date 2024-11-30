@@ -33,7 +33,7 @@
 
 ## Average votes calculation
 The calculation that is used for determining the average votes for each project is an approximation made by me that uses the following formula: `average_votes = (doubloons_per_hour - 4.8) / 1.92`.
-It assumes the minimum hourly doubloons value is `4.8` and the maximum is `24` (values obtained from the `minimumHoursEstimated`, `maximumHoursEstimated` and `priceGlobal`/`priceUs` values from `shop.json`) and that the function is linear (its just a guess that is most likely wrong).
+It assumes the minimum hourly doubloons value is `4.8` and the maximum is `24` (values obtained from the `minimumHoursEstimated`, `maximumHoursEstimated` and `priceGlobal`/`priceUs` values from `shop.json` using the script located at `scripts/vote_averages_calculator.py`) and that the function is linear (its just a guess that is most likely wrong).
 Using the formula, the table for each vote number is:
 
 | Votes | Range                   |
