@@ -266,15 +266,16 @@ function addProjectToList(name, earnings, hours, blessed) {
   const averageVotes = (hourlyRate - 4.8) / 1.92
 
   const projectItem = document.createElement("li");
+  projectItem.classList.add("project-item")
 
   const projectInfo = document.createElement("div");
   projectInfo.classList.add("project-info");
   projectInfo.innerHTML = `
       <strong class="projectNameInfo">${(blessed && !name.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' : ''}${name}</strong>
-      <span>Earnings: ${earnings} ${doubloonImage}${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ''}</span>
-      <span>Hours: ${hours} ${hoursSvg}</span>
-      <span>Doubloons/Hour: ${hourlyRate} ${blessed ? ` (+${unblessedRate})` : ''}</span>
-      <span>Votes: ~${averageVotes.toFixed(0)}/10 ${votesSvg}${averageVotes > 10 || averageVotes < 0 ? " ???" : ""}</span>
+      <span class="label">Earnings: </span><span class="value">${doubloonImage} ${earnings} ${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ''}</span>
+      <span class="label">Hours: </span><span class="value">${hoursSvg} ${hours} hours</span>
+      <span class="label">Doubloons/Hour: </span><span class="value">${doubloonImage} ${hourlyRate} ${blessed ? ` (+${unblessedRate})` : ''} / hour</span>
+      <span class="label">Votes: </span><span class="value">${votesSvg} ~${averageVotes.toFixed(0)}/10 ${averageVotes > 10 || averageVotes < 0 ? " ???" : ""} votes</span>
   `;
 
   const editButton = document.createElement("button");
@@ -296,8 +297,8 @@ function addProjectToList(name, earnings, hours, blessed) {
     // Populate inputs with current project data for editing
     const project = editButton.parentElement.parentElement;
     projectNameInput.value = project.querySelector('.projectNameInfo').textContent;
-    projectEarningsInput.value = project.querySelector('span:nth-child(2)').textContent.split(' ')[1];
-    projectHoursInput.value = project.querySelector('span:nth-child(3)').textContent.split(' ')[1];
+    projectEarningsInput.value = project.querySelector('span:nth-child(3)').textContent.split(' ')[1];
+    projectHoursInput.value = project.querySelector('span:nth-child(5)').textContent.split(' ')[1];
     isBlessed.checked = project.classList.contains("blessedProject");
     // Store the project item for later replacement
     projectItem.dataset.editing = true; // Mark this item as being edited
@@ -329,6 +330,10 @@ function addProjectToList(name, earnings, hours, blessed) {
     submitButton.textContent = "Add Project";
   });
 
+  projectInfo.addEventListener("click", () => {
+    projectItem.classList.toggle("unexpanded");
+  });
+
   // Append buttons to the project item
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("project-button-container");
@@ -336,6 +341,7 @@ function addProjectToList(name, earnings, hours, blessed) {
   buttonContainer.appendChild(removeButton);
   projectItem.appendChild(projectInfo);
   projectItem.appendChild(buttonContainer);
+  projectItem.classList.add("unexpanded");
   projectsList.appendChild(projectItem);
   projectItem.classList.toggle("blessedProject", !!blessed);
 }
@@ -343,7 +349,7 @@ function addProjectToList(name, earnings, hours, blessed) {
 // Calculate total hours
 function calculateTotalHours() {
   totalHours = [...projectsList.children].reduce((sum, item) => {
-    const hours = parseFloat(item.querySelector("span:nth-child(3)").textContent.match(/([\d.]+)/)[0]);
+    const hours = parseFloat(item.querySelector("span:nth-child(5)").textContent.match(/([\d.]+)/)[0]);
     return sum + (isNaN(hours) ? 0 : hours);
   }, 0);
 }
@@ -351,7 +357,7 @@ function calculateTotalHours() {
 // Calculate total earnings
 function calculateTotalEarnings() {
   totalEarnings = [...projectsList.children].reduce((sum, item) => {
-    const earnings = parseFloat(item.querySelector("span").textContent.match(/([\d.]+)/)[0]);
+    const earnings = parseFloat(item.querySelector(".value").textContent.match(/([\d.]+)/)[0]);
     return sum + (isNaN(earnings) ? 0 : earnings);
   }, 0);
 }
@@ -365,7 +371,7 @@ function updateTotals() {
   // Calculate blessed earnings and blessed hours
   const blessedProjects = [...projectsList.children].filter(item => item.classList.contains("blessedProject"));
   const blessedEarnings = blessedProjects.reduce((sum, item) => {
-    const earnings = parseFloat(item.querySelector("span").textContent.match(/([\d.]+)/)[0]);
+    const earnings = parseFloat(item.querySelector(".value").textContent.match(/([\d.]+)/)[0]);
     return sum + (earnings - earnings / 1.2);
   }, 0);
 
@@ -373,10 +379,10 @@ function updateTotals() {
 
   const averageVotes = (averageHourlyRate - 4.8) / 1.92
 
-  totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} ${doubloonImage}${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
-  totalHoursDisplay.innerHTML = `Total Hours: ${totalHours.toFixed(2)} ${hoursSvg}`;
-  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${averageHourlyRate} ${doubloonImage}/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
-  averageVotesDisplay.innerHTML = `Average Votes: ~${averageVotes.toFixed(0)}/10 ${votesSvg}`;
+  totalEarningsDisplay.innerHTML = `Total Earnings: ${doubloonImage} ${totalEarnings} ${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
+  totalHoursDisplay.innerHTML = `Total Hours: ${hoursSvg} ${totalHours.toFixed(2)} hours`;
+  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${doubloonImage} ${averageHourlyRate} / hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
+  averageVotesDisplay.innerHTML = `Average Votes: ${votesSvg} ~${averageVotes.toFixed(0)}/10 ${averageVotes > 10 || averageVotes < 0 ? " ???" : ""} votes`;
 }
 
 // Save projects and totals to localStorage
@@ -385,7 +391,7 @@ function saveProjectsToLocalStorage() {
       const projectInfo = item.querySelector(".project-info");
       const name = projectInfo.querySelector("strong").textContent.replace('🏴‍☠️ ', '');
       const blessed = !!(item.classList.contains("blessedProject"));
-      const [earnings, hours] = [...projectInfo.querySelectorAll("span")]
+      const [earnings, hours] = [...projectInfo.querySelectorAll(".value")]
           .map(span => parseFloat(span.textContent.match(/([\d.]+)/)[0]));
 
       return { name, earnings, hours, blessed };
@@ -441,11 +447,14 @@ projectForm.addEventListener("submit", (e) => {
       const editingItem = [...projectsList.children].find(item => item.dataset.editing);
       if (editingItem) {
           // Update the existing project
+          const projectHourlyRate = projectEarnings / projectHours;
+          const projectAverageVotes = (projectHourlyRate - 4.8) / 1.92
           editingItem.querySelector(".projectNameInfo").textContent = blessed ? '🏴‍☠️ ' + projectName : projectName;
-          const spans = editingItem.querySelectorAll("span");
-          spans[0].innerHTML = `Earnings: ${projectEarnings} ${doubloonImage}${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
-          spans[1].textContent = `Hours: ${projectHours}`;
-          spans[2].textContent = `Doubloons/Hour: ${(projectEarnings / projectHours).toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ''}`;
+          const spans = editingItem.querySelectorAll(".value");
+          spans[0].innerHTML = `${doubloonImage} ${projectEarnings} ${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ''}`;
+          spans[1].innerHTML = `${hoursSvg} ${projectHours} hours`;
+          spans[2].innerHTML = `${doubloonImage} ${projectHourlyRate.toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ''} / hour`;
+          spans[3].innerHTML = `${votesSvg} ~${projectAverageVotes.toFixed(0)}/10 ${projectAverageVotes > 10 || projectAverageVotes < 0 ? " ???" : ""} votes`;
 
           // Update blessed state
           editingItem.classList.toggle("blessedProject", blessed);
@@ -534,7 +543,7 @@ exportButton.addEventListener("click", () => {
     const projectInfo = item.querySelector(".project-info");
     const name = projectInfo.querySelector("strong").textContent.replace('🏴‍☠️ ', '');
     const blessed = !!(item.classList.contains("blessedProject"));
-    const [earnings, hours] = [...projectInfo.querySelectorAll("span")]
+    const [earnings, hours] = [...projectInfo.querySelectorAll("value")]
         .map(span => parseFloat(span.textContent.match(/([\d.]+)/)[0]));
 
     return { name, earnings, hours, blessed };

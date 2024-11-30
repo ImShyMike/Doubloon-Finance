@@ -260,6 +260,7 @@ button:hover {
 .project-info {
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .project-remove-btn {
@@ -491,8 +492,37 @@ button:hover {
 
 .form-submit-container {
     display: flex;
-    flex-direction: column;
     gap: 10px;
     flex: auto;
     flex-direction: row;
+}
+
+.unexpanded > .project-info {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.unexpanded > span {
+    flex: 1;
+}
+
+.unexpanded > .project-info > .label {
+    display: none !important;
+}
+
+.unexpanded > .project-info > .value {
+    background-color: var(--surface1);
+    padding-left: 7px;
+    padding-right: 7px;
+    border-radius: 15px;
+}
+
+.unexpanded > .project-button-container {
+    flex-direction: row;
+}
+
+.project-info > .label {
+    font-weight: bold;
+    color: var(--subtext1)
 }
