@@ -16,16 +16,18 @@
 
 ### Input field:
 ![Usage Input](assets/usage.png)
-- Project name
-- Doubloons earned
-- Hours spent
-- Was the project blessed?
+1. Project name
+2. Doubloons earned
+3. Hours spent
+4. Was the project blessed?
 
 ### Project list:
-![Usage Project](assets/usage2.png)
-- Project name (flag and color means its blessed)
-- Doubloons earned
-- Hours spent
+![Usage Project](assets/usage3.png)
+1. Project name (flag and color means its blessed)
+2. Doubloons earned
+3. Hours spent
+4. Doubloons per hour
+5. Average votes received
 
 (values in brackets show much the blessing changed the original values)
 
