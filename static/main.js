@@ -543,7 +543,7 @@ exportButton.addEventListener("click", () => {
     const projectInfo = item.querySelector(".project-info");
     const name = projectInfo.querySelector("strong").textContent.replace('🏴‍☠️ ', '');
     const blessed = !!(item.classList.contains("blessedProject"));
-    const [earnings, hours] = [...projectInfo.querySelectorAll("value")]
+    const [earnings, hours] = [...projectInfo.querySelectorAll(".value")]
         .map(span => parseFloat(span.textContent.match(/([\d.]+)/)[0]));
 
     return { name, earnings, hours, blessed };
