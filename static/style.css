@@ -301,6 +301,11 @@ button:hover {
     gap: 4px;
 }
 
+#projectsContainer > .info {
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
 .project-form {
     display: flex;
     flex-wrap: wrap;

@@ -6,6 +6,7 @@ const projectsList = document.getElementById("projectsList");
 const totalEarningsDisplay = document.getElementById("totalEarnings");
 const totalHoursDisplay = document.getElementById("totalHours");
 const averageHourlyRateDisplay = document.getElementById("averageHourlyRate");
+const averageVotesDisplay = document.getElementById("averageVotes");
 const shopContainer = document.getElementById("shopContainer");
 const locationFilter = document.getElementById("locationFilter");
 const goalName = document.getElementById("goalName");
@@ -30,6 +31,9 @@ let selectedItemId = null; // Track the selected item ID
 
 const doubloonUrl = "https://raw.githubusercontent.com/hackclub/high-seas/refs/heads/main/public/doubloon.svg";
 const doubloonImage = `<img src="${doubloonUrl}" alt="doubloons" width="20" height="20" draggable="false" class="doubloon">`
+
+const hoursSvg = '<svg fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" xmlns="http://www.w3.org/2000/svg" aria-label="clock" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="24" height="24" style="display: inline-block; vertical-align: middle;"><g><path fill-rule="evenodd" clip-rule="evenodd" d="M26 16c0 5.523-4.477 10-10 10S6 21.523 6 16 10.477 6 16 6s10 4.477 10 10zm2 0c0 6.627-5.373 12-12 12S4 22.627 4 16 9.373 4 16 4s12 5.373 12 12z"></path><path d="M15.64 17a1 1 0 0 1-1-1V9a1 1 0 0 1 2 0v7a1 1 0 0 1-1 1z"></path><path d="M21.702 19.502a1 1 0 0 1-1.366.366l-5.196-3a1 1 0 0 1 1-1.732l5.196 3a1 1 0 0 1 .366 1.366z"></path></g></svg>'
+const votesSvg = '<svg fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="18" height="18" style="display: inline-block; vertical-align: middle;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm64 192c17.7 0 32 14.3 32 32l0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-96c0-17.7 14.3-32 32-32zm64-64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 192c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-192zM320 288c17.7 0 32 14.3 32 32l0 32c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-32c0-17.7 14.3-32 32-32z"></path></svg>'
 
 const textEncoder = new TextEncoder();
 
@@ -259,6 +263,8 @@ function addProjectToList(name, earnings, hours, blessed) {
   const hourlyRate = (earnings / hours).toFixed(2);
   const unblessedRate = ((earnings - earnings / 1.2) / hours).toFixed(2);
 
+  const averageVotes = (hourlyRate - 4.8) / 1.92
+
   const projectItem = document.createElement("li");
 
   const projectInfo = document.createElement("div");
@@ -266,8 +272,9 @@ function addProjectToList(name, earnings, hours, blessed) {
   projectInfo.innerHTML = `
       <strong class="projectNameInfo">${(blessed && !name.includes('🏴‍☠️ ')) ? '🏴‍☠️ ' : ''}${name}</strong>
       <span>Earnings: ${earnings} ${doubloonImage}${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ''}</span>
-      <span>Hours: ${hours}</span>
+      <span>Hours: ${hours} ${hoursSvg}</span>
       <span>Doubloons/Hour: ${hourlyRate} ${blessed ? ` (+${unblessedRate})` : ''}</span>
+      <span>Votes: ~${averageVotes.toFixed(0)}/10 ${votesSvg}${averageVotes > 10 || averageVotes < 0 ? " ???" : ""}</span>
   `;
 
   const editButton = document.createElement("button");
@@ -364,9 +371,12 @@ function updateTotals() {
 
   const blessedAverageHours = (blessedEarnings / totalHours).toFixed(2)
 
+  const averageVotes = (averageHourlyRate - 4.8) / 1.92
+
   totalEarningsDisplay.innerHTML = `Total Earnings: ${totalEarnings} ${doubloonImage}${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ''}`;
-  totalHoursDisplay.innerHTML = `Total Hours: ${totalHours.toFixed(2)}`;
+  totalHoursDisplay.innerHTML = `Total Hours: ${totalHours.toFixed(2)} ${hoursSvg}`;
   averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${averageHourlyRate} ${doubloonImage}/hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ''}`;
+  averageVotesDisplay.innerHTML = `Average Votes: ~${averageVotes.toFixed(0)}/10 ${votesSvg}`;
 }
 
 // Save projects and totals to localStorage
