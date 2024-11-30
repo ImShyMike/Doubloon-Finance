@@ -429,32 +429,6 @@ function saveProjectsToLocalStorage() {
 
 // Load shop data on page load
 document.addEventListener("DOMContentLoaded", () => {
-  loadShopData().then(() => {
-    // Restore the filter
-    restoreFilter();
-
-    // Restore saved projects
-    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    savedProjects.forEach((project) =>
-      addProjectToList(
-        project.name,
-        project.earnings,
-        project.hours,
-        project.blessed,
-      ),
-    );
-
-    // Restore selected item
-    restoreSelection();
-
-    // Update totals
-    updateTotals();
-
-    if (selectedItemId) {
-      handleSelection(selectedItemId);
-    }
-  });
-
   // Attach filter event
   locationFilter.addEventListener("change", filterShop);
 
@@ -611,5 +585,31 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.clipboard.writeText(b64String);
 
     alert("Data copied to clipboard!");
+  });
+
+  loadShopData().then(() => {
+    // Restore the filter
+    restoreFilter();
+
+    // Restore saved projects
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    savedProjects.forEach((project) =>
+      addProjectToList(
+        project.name,
+        project.earnings,
+        project.hours,
+        project.blessed,
+      ),
+    );
+
+    // Restore selected item
+    restoreSelection();
+
+    // Update totals
+    updateTotals();
+
+    if (selectedItemId) {
+      handleSelection(selectedItemId);
+    }
   });
 });
