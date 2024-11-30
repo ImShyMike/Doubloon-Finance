@@ -427,9 +427,6 @@ function saveProjectsToLocalStorage() {
   localStorage.setItem("projects", JSON.stringify(projectItems));
 }
 
-// Attach filter event
-locationFilter.addEventListener("change", filterShop);
-
 // Load shop data on page load
 document.addEventListener("DOMContentLoaded", () => {
   loadShopData().then(() => {
@@ -457,159 +454,162 @@ document.addEventListener("DOMContentLoaded", () => {
       handleSelection(selectedItemId);
     }
   });
-});
 
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 0) {
-    scrollToTop.classList.remove("hidden");
-  } else {
-    scrollToTop.classList.add("hidden");
-  }
-});
+  // Attach filter event
+  locationFilter.addEventListener("change", filterShop);
 
-// Handle project submission
-projectForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const projectName = projectNameInput.value.replace("🏴‍☠️ ", "").trim();
-  const projectEarnings = parseFloat(projectEarningsInput.value);
-  const projectHours = parseFloat(projectHoursInput.value);
-  const blessed = !!isBlessed.checked;
-
-  if (projectName && !isNaN(projectEarnings) && !isNaN(projectHours)) {
-    // Check if editing an existing project
-    const editingItem = [...projectsList.children].find(
-      (item) => item.dataset.editing,
-    );
-    if (editingItem) {
-      // Update the existing project
-      const projectHourlyRate = projectEarnings / projectHours;
-      const projectAverageVotes = (projectHourlyRate - 4.8) / 1.92;
-      editingItem.querySelector(".projectNameInfo").textContent = blessed
-        ? "🏴‍☠️ " + projectName
-        : projectName;
-      const spans = editingItem.querySelectorAll(".value");
-      spans[0].innerHTML = `${doubloonImage} ${projectEarnings} ${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ""}`;
-      spans[1].innerHTML = `${hoursSvg} ${projectHours} hours`;
-      spans[2].innerHTML = `${doubloonImage} ${projectHourlyRate.toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ""} / hour`;
-      spans[3].innerHTML = `${votesSvg} ~${projectAverageVotes.toFixed(0)}/10 ${projectAverageVotes > 10 || projectAverageVotes < 0 ? " ???" : ""} votes`;
-
-      // Update blessed state
-      editingItem.classList.toggle("blessedProject", blessed);
-
-      // Set the exit button back to "Edit"
-      editingItem.getElementsByClassName("project-edit-btn")[0].textContent =
-        "Edit";
-
-      // Remove editing marker
-      delete editingItem.dataset.editing;
-
-      // Restore submit button text
-      submitButton.textContent = "Add Project";
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 0) {
+      scrollToTop.classList.remove("hidden");
     } else {
-      // Add project to the list
-      addProjectToList(projectName, projectEarnings, projectHours, !!blessed);
+      scrollToTop.classList.add("hidden");
     }
+  });
 
-    // Update totals
-    updateTotals(); // Update totals after adding or editing a project
+  // Handle project submission
+  projectForm.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-    // Save to localStorage
-    saveProjectsToLocalStorage();
+    const projectName = projectNameInput.value.replace("🏴‍☠️ ", "").trim();
+    const projectEarnings = parseFloat(projectEarningsInput.value);
+    const projectHours = parseFloat(projectHoursInput.value);
+    const blessed = !!isBlessed.checked;
 
-    // Clear inputs
-    projectNameInput.value = "";
-    projectEarningsInput.value = "";
-    projectHoursInput.value = "";
-    isBlessed.checked = false;
-
-    if (selectedItemId) {
-      handleSelection(selectedItemId);
-    }
-  }
-});
-
-importButton.addEventListener("click", () => {
-  const b64String = prompt("Paste text here:");
-  const binaryString = atob(b64String);
-  const decodedData = new Uint8Array(
-    binaryString.split("").map((char) => char.charCodeAt(0)),
-  );
-  const textDecoder = new TextDecoder();
-  const jsonString = textDecoder.decode(decodedData);
-  const importedData = JSON.parse(jsonString);
-
-  const { filter, projects, selectedItem } = importedData;
-
-  if (filter && projects && selectedItem) {
-    // Apply location filter
-    locationFilter.value = filter;
-
-    // Clear existing projects
-    projectsList.innerHTML = "";
-
-    // Add imported projects
-    projects.forEach((project) => {
-      addProjectToList(
-        project.name,
-        project.earnings,
-        project.hours,
-        project.blessed,
+    if (projectName && !isNaN(projectEarnings) && !isNaN(projectHours)) {
+      // Check if editing an existing project
+      const editingItem = [...projectsList.children].find(
+        (item) => item.dataset.editing,
       );
+      if (editingItem) {
+        // Update the existing project
+        const projectHourlyRate = projectEarnings / projectHours;
+        const projectAverageVotes = (projectHourlyRate - 4.8) / 1.92;
+        editingItem.querySelector(".projectNameInfo").textContent = blessed
+          ? "🏴‍☠️ " + projectName
+          : projectName;
+        const spans = editingItem.querySelectorAll(".value");
+        spans[0].innerHTML = `${doubloonImage} ${projectEarnings} ${blessed ? ` (+${(projectEarnings - projectEarnings / 1.2).toFixed(0)})` : ""}`;
+        spans[1].innerHTML = `${hoursSvg} ${projectHours} hours`;
+        spans[2].innerHTML = `${doubloonImage} ${projectHourlyRate.toFixed(2)} ${blessed ? ` (+${((projectEarnings - projectEarnings / 1.2) / projectHours).toFixed(2)})` : ""} / hour`;
+        spans[3].innerHTML = `${votesSvg} ~${projectAverageVotes.toFixed(0)}/10 ${projectAverageVotes > 10 || projectAverageVotes < 0 ? " ???" : ""} votes`;
+
+        // Update blessed state
+        editingItem.classList.toggle("blessedProject", blessed);
+
+        // Set the exit button back to "Edit"
+        editingItem.getElementsByClassName("project-edit-btn")[0].textContent =
+          "Edit";
+
+        // Remove editing marker
+        delete editingItem.dataset.editing;
+
+        // Restore submit button text
+        submitButton.textContent = "Add Project";
+      } else {
+        // Add project to the list
+        addProjectToList(projectName, projectEarnings, projectHours, !!blessed);
+      }
+
+      // Update totals
+      updateTotals(); // Update totals after adding or editing a project
+
+      // Save to localStorage
+      saveProjectsToLocalStorage();
+
+      // Clear inputs
+      projectNameInput.value = "";
+      projectEarningsInput.value = "";
+      projectHoursInput.value = "";
+      isBlessed.checked = false;
+
+      if (selectedItemId) {
+        handleSelection(selectedItemId);
+      }
+    }
+  });
+
+  importButton.addEventListener("click", () => {
+    const b64String = prompt("Paste text here:");
+    const binaryString = atob(b64String);
+    const decodedData = new Uint8Array(
+      binaryString.split("").map((char) => char.charCodeAt(0)),
+    );
+    const textDecoder = new TextDecoder();
+    const jsonString = textDecoder.decode(decodedData);
+    const importedData = JSON.parse(jsonString);
+
+    const { filter, projects, selectedItem } = importedData;
+
+    if (filter && projects && selectedItem) {
+      // Apply location filter
+      locationFilter.value = filter;
+
+      // Clear existing projects
+      projectsList.innerHTML = "";
+
+      // Add imported projects
+      projects.forEach((project) => {
+        addProjectToList(
+          project.name,
+          project.earnings,
+          project.hours,
+          project.blessed,
+        );
+      });
+
+      filterShop();
+
+      // Update the selected item
+      selectedItemId = selectedItem;
+      localStorage.setItem(
+        "selectedItem",
+        JSON.stringify({ id: selectedItemId }),
+      );
+
+      handleSelection(selectedItemId);
+
+      // Update goal container
+      updateGoalContainer(selectedItemId);
+
+      // Update totals
+      updateTotals();
+
+      // Save imported state to localStorage
+      saveProjectsToLocalStorage();
+
+      // Reselect to calculate goal data
+      handleSelection(selectedItemId);
+    } else {
+      alert("Invalid data, could not import!");
+    }
+  });
+
+  exportButton.addEventListener("click", () => {
+    const projects = [...projectsList.children].map((item) => {
+      const projectInfo = item.querySelector(".project-info");
+      const name = projectInfo
+        .querySelector("strong")
+        .textContent.replace("🏴‍☠️ ", "");
+      const blessed = !!item.classList.contains("blessedProject");
+      const [earnings, hours] = [...projectInfo.querySelectorAll(".value")].map(
+        (span) => parseFloat(span.textContent.match(/([\d.]+)/)[0]),
+      );
+
+      return { name, earnings, hours, blessed };
     });
 
-    filterShop();
+    const jsonString = JSON.stringify({
+      filter: locationFilter.value,
+      projects,
+      selectedItem: selectedItemId,
+    });
+    const encodedData = textEncoder.encode(jsonString);
+    const binaryString = Array.from(encodedData)
+      .map((byte) => String.fromCharCode(byte))
+      .join("");
+    const b64String = btoa(binaryString);
+    navigator.clipboard.writeText(b64String);
 
-    // Update the selected item
-    selectedItemId = selectedItem;
-    localStorage.setItem(
-      "selectedItem",
-      JSON.stringify({ id: selectedItemId }),
-    );
-
-    handleSelection(selectedItemId);
-
-    // Update goal container
-    updateGoalContainer(selectedItemId);
-
-    // Update totals
-    updateTotals();
-
-    // Save imported state to localStorage
-    saveProjectsToLocalStorage();
-
-    // Reselect to calculate goal data
-    handleSelection(selectedItemId);
-  } else {
-    alert("Invalid data, could not import!");
-  }
-});
-
-exportButton.addEventListener("click", () => {
-  const projects = [...projectsList.children].map((item) => {
-    const projectInfo = item.querySelector(".project-info");
-    const name = projectInfo
-      .querySelector("strong")
-      .textContent.replace("🏴‍☠️ ", "");
-    const blessed = !!item.classList.contains("blessedProject");
-    const [earnings, hours] = [...projectInfo.querySelectorAll(".value")].map(
-      (span) => parseFloat(span.textContent.match(/([\d.]+)/)[0]),
-    );
-
-    return { name, earnings, hours, blessed };
+    alert("Data copied to clipboard!");
   });
-
-  const jsonString = JSON.stringify({
-    filter: locationFilter.value,
-    projects,
-    selectedItem: selectedItemId,
-  });
-  const encodedData = textEncoder.encode(jsonString);
-  const binaryString = Array.from(encodedData)
-    .map((byte) => String.fromCharCode(byte))
-    .join("");
-  const b64String = btoa(binaryString);
-  navigator.clipboard.writeText(b64String);
-
-  alert("Data copied to clipboard!");
 });
