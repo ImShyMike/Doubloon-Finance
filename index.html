@@ -1,84 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="shortcut icon" href="https://highseas.hackclub.com/doubloon.svg">
+        <link rel="shortcut icon" href="https://highseas.hackclub.com/doubloon.svg">
 
-    <title>Doubloon Finance</title>
-    <meta name="description" content="Website to keep track your HackClub HighSeas earnings">
+        <title>Doubloon Finance</title>
+        <meta name="description" content="Website to keep track your HackClub HighSeas earnings">
 
-    <meta property="og:title" content="Doubloon Finance">
-    <meta property="og:description" content="Website to keep track your HackClub HighSeas earnings">
-    <meta property="og:image" content="https://highseas.hackclub.com/doubloon.svg">
-    <meta property="og:site_name" content="Doubloon Finance">
-    <meta property="og:type" content="website">
-            
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Doubloon Finance">
-    <meta name="twitter:description" content="Website to keep track your HackClub HighSeas earnings">
-    <meta name="twitter:image" content="https://highseas.hackclub.com/doubloon.svg">
+        <meta property="og:title" content="Doubloon Finance">
+        <meta property="og:description" content="Website to keep track your HackClub HighSeas earnings">
+        <meta property="og:image" content="https://highseas.hackclub.com/doubloon.svg">
+        <meta property="og:site_name" content="Doubloon Finance">
+        <meta property="og:type" content="website">
+                
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Doubloon Finance">
+        <meta name="twitter:description" content="Website to keep track your HackClub HighSeas earnings">
+        <meta name="twitter:image" content="https://highseas.hackclub.com/doubloon.svg">
 
-    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=rethink-sans:400&display=swap">
-    <link rel="stylesheet" href="static/style.css">
-</head>
-<body>
-    <header>
-        <h1 id="title">Doubloon Finance</h1>
-    </header>
-    <main>
-        <div id="projectsContainer" class="container">
-            <div id="projectsContainerTop">
-                <h2 id="projectsContainerTitle">Projects and Earnings</h2>
-                <div class="button-container">
-                    <button type="submit" class="customButton" id="importButton">Import</button>
-                    <button type="submit" class="customButton" id="exportButton">Export</button>
+        <link rel="stylesheet" href="https://fonts.bunny.net/css?family=rethink-sans:400&display=swap">
+        <link rel="stylesheet" href="static/style.css">
+    </head>
+    <body>
+        <header>
+            <h1 id="title">Doubloon Finance</h1>
+        </header>
+        <main>
+            <div id="projectsContainer" class="container">
+                <div id="projectsContainerTop">
+                    <h2 id="projectsContainerTitle">Projects and Earnings</h2>
+                    <div class="button-container">
+                        <button type="submit" class="customButton" id="importButton">Import</button>
+                        <button type="submit" class="customButton" id="exportButton">Export</button>
+                    </div>
                 </div>
+                <form id="projectForm" class="project-form">
+                    <input type="text" id="projectName" placeholder="Project Name" required>
+                    <input type="number" id="projectEarnings" placeholder="Earnings" required>
+                    <input type="number" step="0.01" id="projectHours" placeholder="Hours Spent" required>
+                    <div class="form-submit-container">
+                        <input type="checkbox" id="isBlessed">
+                        <button type="submit" id="submitButton">Add Project</button>
+                    </div>
+                </form>
+
+                <ul id="projectsList" class="projects-list"></ul>
+
+                <p id="totalEarnings" class="info">Total Earnings: 0</p>
+                <p id="totalHours" class="info">Total Hours: 0</p>
+                <p id="averageHourlyRate" class="info">Hourly Rate: 0 /hour</p>
+                <p id="averageVotes" class="info">Average Votes: 0</p>
             </div>
-            <form id="projectForm" class="project-form">
-                <input type="text" id="projectName" placeholder="Project Name" required>
-                <input type="number" id="projectEarnings" placeholder="Earnings" required>
-                <input type="number" step="0.01" id="projectHours" placeholder="Hours Spent" required>
-                <div class="form-submit-container">
-                    <input type="checkbox" id="isBlessed">
-                    <button type="submit" id="submitButton">Add Project</button>
-                </div>
-            </form>
+            
+            <div id="goalContainer" class="container">
+                <h2>Goal</h2>
+                <img src="" alt="" draggable="false" id="goalImage">
+                <p id="goalName" class="info">None (0)</p>
+                <p id="doubloonsLeft" class="info">Doubloons until goal: 0</p>
+                <p id="timeLeft" class="info">Estimated hours left: 0</p>
+                <p style="display:inline;">Can buy: </p><p style="display:inline;" id="canBuyGoal">No (0%)</p>
+            </div>
 
-            <ul id="projectsList" class="projects-list"></ul>
+            <div class="filter-container">
+                <label for="locationFilter">Location:</label>
+                <select id="locationFilter">
+                    <option value="All">️🏴‍☠️ all across the 7 seas</option>
+                    <option value="Us">🇺🇸 US</option>
+                    <option value="Eu">🇪🇺 EU + 🇬🇧 UK</option>
+                    <option value="In">🇮🇳 India</option>
+                    <option value="Ca">🍁 Canada</option>
+                    <option value="Xx">🗺 other countries worldwide...</option>
+                </select>
+            </div>
+            
+            <div id="shopContainer" class="shop-container"></div>
 
-            <p id="totalEarnings" class="info">Total Earnings: 0</p>
-            <p id="totalHours" class="info">Total Hours: 0</p>
-            <p id="averageHourlyRate" class="info">Hourly Rate: 0 /hour</p>
-            <p id="averageVotes" class="info">Average Votes: 0</p>
-        </div>
-        
-        <div id="goalContainer" class="container">
-            <h2>Goal</h2>
-            <img src="" alt="" draggable="false" id="goalImage">
-            <p id="goalName" class="info">None (0)</p>
-            <p id="doubloonsLeft" class="info">Doubloons until goal: 0</p>
-            <p id="timeLeft" class="info">Estimated hours left: 0</p>
-            <p style="display:inline;">Can buy: </p><p style="display:inline;" id="canBuyGoal">No (0%)</p>
-        </div>
-
-        <div class="filter-container">
-            <label for="locationFilter">Location:</label>
-            <select id="locationFilter">
-                <option value="All">️🏴‍☠️ all across the 7 seas</option>
-                <option value="Us">🇺🇸 US</option>
-                <option value="Eu">🇪🇺 EU + 🇬🇧 UK</option>
-                <option value="In">🇮🇳 India</option>
-                <option value="Ca">🍁 Canada</option>
-                <option value="Xx">🗺 other countries worldwide...</option>
-            </select>
-        </div>
-        
-        <div id="shopContainer" class="shop-container"></div>
-
-        <a id="scrollToTop" class="hidden" href="#">&#129033;</a>
-    </main>
-</body>
-<script src="static/main.js"></script>
+            <a id="scrollToTop" class="hidden" href="#">&#129033;</a>
+        </main>
+    </body>
+    <script src="static/main.js"></script>
 </html>
