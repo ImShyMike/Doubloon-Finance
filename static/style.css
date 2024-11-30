@@ -394,6 +394,11 @@ button:hover {
         margin: 0 5px;
         max-width: 500px;
     }
+
+    .project-button-container {
+        flex-direction: column !important;
+        margin-left: 5px;
+    }
 }
 
 .hidden {
