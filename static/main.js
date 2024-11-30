@@ -101,7 +101,7 @@ function renderShop(data) {
       <h3>${item.name}</h3>
       <p>${doubloonImage} ${price} (${minTime}-${maxTime} hours)</p>
       <p>${subtitle}</p>
-      <img src="${item.imageUrl}" alt="${item.name}" class="shop-item-image" draggable="false" loading="lazy"/>
+      <img src="${item.imageUrl}" alt="${item.name}" class="shop-item-image" draggable="false" loading="lazy"  width="220" height="165"/>
     `;
 
     shopItem.item = item;
