@@ -19,6 +19,10 @@ const isBlessed = document.getElementById("isBlessed");
 const submitButton = document.getElementById("submitButton");
 const importButton = document.getElementById("importButton");
 const exportButton = document.getElementById("exportButton");
+const selectedItemDropdown = document.getElementById("selectedItem");
+const spendingsForm = document.getElementById("spendingsForm");
+const spendingsList = document.getElementById("spendingsList");
+const totalSpentDisplay = document.getElementById("totalSpent");
 
 let totalEarnings = 0;
 let totalHours = 0;
@@ -27,6 +31,7 @@ const locations = ["Us", "Eu", "In", "Xx", "Ca", "All"];
 
 let shopData = [];
 let filteredData = [];
+let totalSpent = {}; // Object to track total spent on each item
 let selectedItemId = null; // Track the selected item ID
 
 const doubloonUrl =
@@ -176,29 +181,39 @@ function updateGoalContainer(id) {
     return;
   }
 
+  const totalSpentAmount = Object.entries(totalSpent).reduce((total, [id, count]) => {
+    const item = shopData.find(item => item.id === id);
+    if (item) {
+        return total + (item.priceGlobal * count); // Calculate total spent for each item
+    }
+    return total; // If item is not found, just return the total
+  }, 0);
+
   // Update the goal container
   let item = getItemById(id);
-  let price = 0;
-  if (item.enabledUs === true) {
-    price = item.priceUs;
-  } else {
-    price = item.priceGlobal;
+  if (!item) {
+    console.warn(`Item with ID ${id} not found in shopData.`);
+    return; // Exit if the item is not found
   }
+
+  let currentDoubloons = Math.max(0, totalEarnings - totalSpentAmount);
+
+  let price = item.enabledUs === true ? item.priceUs : item.priceGlobal;
   goalName.innerHTML = `${item.name} (${price} ${doubloonImage})`;
 
   // Calculate doubloons left until the goal
-  const doubloonsNeeded = price - totalEarnings;
+  const doubloonsNeeded = price - currentDoubloons;
   doubloonsLeft.innerHTML = `Doubloons until goal: ${doubloonsNeeded > 0 ? doubloonsNeeded : 0} ${doubloonImage}`;
 
   // Calculate estimated time left based on current doubloons and average hourly rate
   const averageHourlyRate = totalHours > 0 ? totalEarnings / totalHours : 0;
   const estimatedHours =
-    averageHourlyRate > 0 ? (price - totalEarnings) / averageHourlyRate : 0;
+    averageHourlyRate > 0 ? (price - currentDoubloons) / averageHourlyRate : 0;
   timeLeft.innerHTML = `Estimated hours left: ${estimatedHours > 0 ? estimatedHours.toFixed(2) : 0}`;
 
   // Calculate if goal can be bought (if yes, how many times)
-  const buyAmount = totalEarnings / price;
-  const remainingToNext = price - (totalEarnings % price);
+  const buyAmount = currentDoubloons / price;
+  const remainingToNext = price - (currentDoubloons % price);
   const remainingPercentage = 100 - (remainingToNext / price) * 100;
   if (buyAmount >= 1) {
     if (remainingPercentage > 0 && remainingPercentage !== 100) {
@@ -220,10 +235,8 @@ function updateGoalContainer(id) {
 
 // Restore selection from localStorage on page load
 function restoreSelection() {
-  if (!selectedItemId) {
-    const selectedItemObj = JSON.parse(localStorage.getItem("selectedItem"));
-    selectedItemId = selectedItemObj?.id || null;
-  }
+  const selectedItemObj = JSON.parse(localStorage.getItem("selectedItem"));
+  selectedItemId = selectedItemObj?.id || null; // Ensure selectedItemId is set correctly
 
   if (selectedItemId) {
     const savedItem = document.querySelector(
@@ -236,6 +249,8 @@ function restoreSelection() {
     } else {
       console.warn("Selected item from storage not found in DOM.");
     }
+  } else {
+    console.warn("No selected item found in localStorage.");
   }
 }
 
@@ -245,6 +260,16 @@ function restoreFilter() {
   if (selectedFilter && locations.includes(selectedFilter)) {
     locationFilter.value = selectedFilter;
   }
+}
+
+function populateSpendingsDropdown(shopData) {
+  selectedItemDropdown.innerHTML = "";
+  shopData.forEach((item) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = item.id;
+    optionElement.text = item.name;
+    selectedItemDropdown.add(optionElement);
+  });
 }
 
 // Filter shop items based on location
@@ -262,6 +287,8 @@ function filterShop() {
       item.availableLocations.includes(selectedLocation),
     );
   }
+
+  populateSpendingsDropdown(filteredData);
 
   renderShop(filteredData);
 }
@@ -406,10 +433,78 @@ function updateTotals() {
   totalEarningsDisplay.innerHTML = `Total Earnings: ${doubloonImage} ${totalEarnings} ${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ""}`;
   totalHoursDisplay.innerHTML = `Total Hours: ${hoursSvg} ${totalHours.toFixed(2)} hours`;
   averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${doubloonImage} ${averageHourlyRate} / hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ""}`;
-  averageVotesDisplay.innerHTML = `Average Votes: ${votesSvg} ~${averageVotes.toFixed(0)}/10 ${averageVotes > 10 || averageVotes < 0 ? " ???" : ""} votes`;
+  averageVotesDisplay.innerHTML = `Average Votes: ${votesSvg} ${averageHourlyRate > 0 ? `~${averageVotes.toFixed(0)}/10 ${averageVotes > 10 || averageVotes < 0 ? " ???" : ""}` : 0} votes`;
 }
 
-// Save projects and totals to localStorage
+// Function to add spending to the list
+function addSpendingToList(name, id) {
+  const spendingsInfoContainer = document.createElement("li");
+  spendingsInfoContainer.dataset.id = id;
+
+  const spendingsInfo = document.createElement("div");
+  spendingsInfo.classList.add("project-info");
+  spendingsInfo.innerHTML = `
+    <strong>${name}</strong>
+    <span class="count">1</span>
+  `;
+
+  const removeButton = document.createElement("button");
+  removeButton.classList.add("remove-spending-btn");
+  removeButton.textContent = "Remove";
+  removeButton.addEventListener("click", () => {
+    const countSpan = spendingsInfo.querySelector('.count');
+    let count = parseInt(countSpan.textContent);
+    if (count > 1) {
+      countSpan.textContent = count - 1;
+      totalSpent[id] -= 1;
+    } else {
+      spendingsInfoContainer.remove();
+      delete totalSpent[id];
+    }
+    updateTotalSpentDisplay();
+  });
+
+  // Check if the item already exists in the spendings list
+  const existingItem = [...spendingsList.children].find(item => item.dataset.id === id);
+  if (existingItem) {
+    // If it exists, increment the count and update total spent
+    const countSpan = existingItem.querySelector('.count');
+    let count = parseInt(countSpan.textContent) + 1;
+    countSpan.textContent = count;
+    totalSpent[id] += 1; // Increment the spent count
+  } else {
+    // Initialize total spent for this item
+    totalSpent[id] = 1; // Set initial spent count
+    spendingsInfoContainer.appendChild(spendingsInfo);
+    spendingsInfoContainer.appendChild(removeButton);
+    spendingsList.appendChild(spendingsInfoContainer);
+  }
+
+  updateTotalSpentDisplay(); // Update display after adding
+
+  const spendingsItems = Object.entries(totalSpent).map(([id, count]) => ({ id, count }))
+
+  localStorage.setItem("spendings", JSON.stringify(spendingsItems));
+}
+
+// Function to update total spent display
+function updateTotalSpentDisplay() {
+  const totalSpentAmount = Object.entries(totalSpent).reduce((total, [id, count]) => {
+      const item = shopData.find(item => item.id === id);
+      if (item) {
+          return total + (item.priceGlobal * count); // Calculate total spent for each item
+      }
+      return total; // If item is not found, just return the total
+  }, 0);
+
+  // Display total spent
+  totalSpentDisplay.innerHTML = `Total Spent: ${doubloonImage} ${totalSpentAmount.toFixed(0)}`;
+  
+  // Update goal container based on total spent
+  updateGoalContainer(selectedItemId);
+}
+
+// Function to save projects and totals to localStorage
 function saveProjectsToLocalStorage() {
   const projectItems = [...projectsList.children].map((item) => {
     const projectInfo = item.querySelector(".project-info");
@@ -438,6 +533,67 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       scrollToTop.classList.add("hidden");
     }
+  });
+
+  spendingsForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const selectedItemId = selectedItemDropdown.value;
+    const selectedItemName = selectedItemDropdown.options[selectedItemDropdown.selectedIndex].text;
+
+    // Check if the item already exists in the spendings list
+    const existingItem = [...spendingsList.children].find(item => item.dataset.id === selectedItemId);
+
+    if (existingItem) {
+        // If it exists, increment the count and update total spent
+        const countSpan = existingItem.querySelector('.count');
+        let count = parseInt(countSpan.textContent) + 1;
+        countSpan.textContent = count;
+
+        // Update total spent for this item
+        totalSpent[selectedItemId] += 1; // Increment the spent count
+    } else {
+        // If it doesn't exist, create a new entry
+        const spendingsInfoContainer = document.createElement("li");
+        spendingsInfoContainer.dataset.id = selectedItemId;
+
+        const spendingsInfo = document.createElement("div");
+        spendingsInfo.classList.add("project-info");
+        spendingsInfo.innerHTML = `
+            <strong>${selectedItemName}</strong>
+            <span class="count">1</span>
+        `;
+
+        // Create a remove button
+        const removeButton = document.createElement("button");
+        removeButton.classList.add("remove-spending-btn");
+        removeButton.textContent = "Remove";
+        removeButton.addEventListener("click", () => {
+            const countSpan = spendingsInfo.querySelector('.count');
+            let count = parseInt(countSpan.textContent);
+            if (count > 1) {
+                countSpan.textContent = count - 1; // Decrement the count
+                totalSpent[selectedItemId] -= 1; // Decrement the spent count
+            } else {
+                spendingsInfoContainer.remove(); // Remove the item if count is 1
+                delete totalSpent[selectedItemId]; // Remove from total spent tracking
+            }
+            updateTotalSpentDisplay(); // Update total spent display
+        });
+
+        // Initialize total spent for this item
+        totalSpent[selectedItemId] = 1; // Set initial spent count
+
+        spendingsInfoContainer.appendChild(spendingsInfo);
+        spendingsInfoContainer.appendChild(removeButton);
+        spendingsList.appendChild(spendingsInfoContainer);
+    }
+
+    updateTotalSpentDisplay(); // Update total spent display
+
+    const spendingsItems = Object.entries(totalSpent).map(([id, count]) => ({ id, count }))
+  
+    localStorage.setItem("spendings", JSON.stringify(spendingsItems));
   });
 
   // Handle project submission
@@ -512,7 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const jsonString = textDecoder.decode(decodedData);
     const importedData = JSON.parse(jsonString);
 
-    const { filter, projects, selectedItem } = importedData;
+    const { filter, projects, selectedItem, spendings } = importedData;
 
     if (filter && projects && selectedItem) {
       // Apply location filter
@@ -553,6 +709,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Reselect to calculate goal data
       handleSelection(selectedItemId);
+
+      if (spendings) {
+        spendingsList.innerHTML = "";
+        totalSpent = {};
+        spendings.forEach(({ id, count }) => {
+          const item = shopData.find(item => item.id === id);
+          for (let i = 0; i < count; i++) {
+            addSpendingToList(item.name, id);
+          }
+        });
+      }
     } else {
       alert("Invalid data, could not import!");
     }
@@ -576,6 +743,7 @@ document.addEventListener("DOMContentLoaded", () => {
       filter: locationFilter.value,
       projects,
       selectedItem: selectedItemId,
+      spendings: Object.entries(totalSpent).map(([id, count]) => ({ id, count })), // Include spendings
     });
     const encodedData = textEncoder.encode(jsonString);
     const binaryString = Array.from(encodedData)
@@ -608,8 +776,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // Update totals
     updateTotals();
 
+    updateTotalSpentDisplay();
+
     if (selectedItemId) {
       handleSelection(selectedItemId);
+    }
+
+    // Restore spendings
+    const savedSpendings = JSON.parse(localStorage.getItem("spendings")) || [];
+    if (savedSpendings) {
+      spendingsList.innerHTML = "";
+      totalSpent = {};
+      savedSpendings.forEach(({ id, count }) => {
+        const item = getItemById(id);
+        for (let i = 0; i < count; i++) {
+          addSpendingToList(item.name, id); // Function to add spending to the list
+        }
+      });
+    }
+
+    // Update total spent display after loading spendings
+    updateTotalSpentDisplay(); // Ensure total spent is updated after loading spendings
+
+    // Update goal container based on total spent
+    if (selectedItemId) {
+      updateGoalContainer(selectedItemId); // Update goal container with the current selected item
+    } else {
+      console.warn("No selected item ID found on page load.");
     }
   });
 });

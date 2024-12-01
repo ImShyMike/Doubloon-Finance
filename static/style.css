@@ -529,3 +529,63 @@ button:hover {
     font-weight: bold;
     color: var(--subtext1)
 }
+
+#itemSubmitButton {
+    flex: 2;
+}
+
+#selectedItem {
+    flex: 3;
+}
+
+#selectedItemLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#selectedItem {
+    background-color: var(--surface0);
+    border: 3px solid var(--mantle);
+    border-radius: 6px;
+    color: var(--text);
+}
+
+#spendingsList {
+    padding: 0px;
+}
+
+#spendingsList li {
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid var(--surface2);
+    border-radius: 4px;
+    background-color: var(--surface0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#spendingsList strong {
+    color: var(--blue);
+}
+
+#totalSpent {
+    color: var(--lavender);
+}
+
+.remove-spending-btn {
+    background-color: var(--red);
+    color: var(--crust);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+    max-width: 65px;
+}
+
+.remove-spending-btn:hover {
+    background-color: var(--mauve);
+}

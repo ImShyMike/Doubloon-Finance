@@ -53,6 +53,23 @@
                 <p id="averageHourlyRate" class="info">Hourly Rate: 0 /hour</p>
                 <p id="averageVotes" class="info">Average Votes: 0</p>
             </div>
+
+            <div id="spendingsContainer" class="container">
+                <h2>Purchases</h2>
+
+                <form id="spendingsForm" class="project-form">
+                    <label for="selectedItemDropdown" id="selectedItemLabel">Item:</label>
+                    <select name="selectedItemDropdown" id="selectedItem" required>
+                      
+                    </select>
+
+                    <button type="submit" id="itemSubmitButton">Add</button>
+                </form>
+
+                <ul id="spendingsList"></ul>
+
+                <strong id="totalSpent" class="info">Total Spent: 0</strong>
+            </div>
             
             <div id="goalContainer" class="container">
                 <h2>Goal</h2>
