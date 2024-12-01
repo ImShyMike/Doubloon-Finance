@@ -15,7 +15,7 @@
 ## Usage
 
 ### Input field:
-![Usage Input](assets/usage.png)
+![Usage Input](assets/usage4.png)
 1. Project name
 2. Doubloons earned
 3. Hours spent

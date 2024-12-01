@@ -462,6 +462,8 @@ function addSpendingToList(name, id) {
       delete totalSpent[id];
     }
     updateTotalSpentDisplay();
+    const spendingsItems = Object.entries(totalSpent).map(([id, count]) => ({ id, count }))
+    localStorage.setItem("spendings", JSON.stringify(spendingsItems));
   });
 
   // Check if the item already exists in the spendings list
