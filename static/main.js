@@ -296,9 +296,9 @@ function filterShop() {
 // Add project to the list
 function addProjectToList(name, earnings, hours, blessed) {
   const hourlyRate = (earnings / hours).toFixed(2);
-  const unblessedRate = ((earnings - earnings / 1.2) / hours).toFixed(2);
+  const blessedRate = ((earnings - earnings / 1.2) / hours);
 
-  const averageVotes = (hourlyRate - 4.8) / 1.92;
+  const averageVotes = blessed ? ((hourlyRate - blessedRate) - 4.8) / 1.92 : (hourlyRate - 4.8) / 1.92;
 
   const projectItem = document.createElement("li");
   projectItem.classList.add("project-item");
@@ -309,7 +309,7 @@ function addProjectToList(name, earnings, hours, blessed) {
       <strong class="projectNameInfo">${blessed && !name.includes("🏴‍☠️ ") ? "🏴‍☠️ " : ""}${name}</strong>
       <span class="label">Earnings: </span><span class="value">${doubloonImage} ${earnings} ${blessed ? ` (+${(earnings - earnings / 1.2).toFixed(0)})` : ""}</span>
       <span class="label">Hours: </span><span class="value">${hoursSvg} ${hours} hours</span>
-      <span class="label">Doubloons/Hour: </span><span class="value">${doubloonImage} ${hourlyRate} ${blessed ? ` (+${unblessedRate})` : ""} / hour</span>
+      <span class="label">Doubloons/Hour: </span><span class="value">${doubloonImage} ${hourlyRate} ${blessed ? ` (+${blessedRate.toFixed(2)})` : ""} / hour</span>
       <span class="label">Votes: </span><span class="value">${votesSvg} ~${averageVotes.toFixed(0)}/10 ${averageVotes > 10 || averageVotes < 0 ? " ???" : ""} votes</span>
   `;
 
@@ -332,7 +332,7 @@ function addProjectToList(name, earnings, hours, blessed) {
     // Populate inputs with current project data for editing
     const project = editButton.parentElement.parentElement;
     projectNameInput.value =
-      project.querySelector(".projectNameInfo").textContent;
+      project.querySelector(".projectNameInfo").textContent.replace("🏴‍☠️ ", "");
     projectEarningsInput.value = project
       .querySelector("span:nth-child(3)")
       .textContent.split(" ")[1];
@@ -426,13 +426,13 @@ function updateTotals() {
     return sum + (earnings - earnings / 1.2);
   }, 0);
 
-  const blessedAverageHours = (blessedEarnings / totalHours).toFixed(2);
+  const blessedAverageHours = (blessedEarnings / totalHours);
 
-  const averageVotes = (averageHourlyRate - 4.8) / 1.92;
+  const averageVotes = ((averageHourlyRate - blessedAverageHours) - 4.8) / 1.92;
 
   totalEarningsDisplay.innerHTML = `Total Earnings: ${doubloonImage} ${totalEarnings} ${blessedEarnings > 0 ? ` (+${blessedEarnings.toFixed(0)})` : ""}`;
   totalHoursDisplay.innerHTML = `Total Hours: ${hoursSvg} ${totalHours.toFixed(2)} hours`;
-  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${doubloonImage} ${averageHourlyRate} / hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours})` : ""}`;
+  averageHourlyRateDisplay.innerHTML = `Hourly Rate: ${doubloonImage} ${averageHourlyRate} / hour${blessedAverageHours > 0 ? ` (+${blessedAverageHours.toFixed(2)})` : ""}`;
   averageVotesDisplay.innerHTML = `Average Votes: ${votesSvg} ${averageHourlyRate > 0 ? `~${averageVotes.toFixed(0)}/10 ${averageVotes > 10 || averageVotes < 0 ? " ???" : ""}` : 0} votes`;
 }
 
@@ -441,10 +441,14 @@ function addSpendingToList(name, id) {
   const spendingsInfoContainer = document.createElement("li");
   spendingsInfoContainer.dataset.id = id;
 
+  const item = getItemById(id);
+  const selectedLocation = locationFilter.value;
+  const price = selectedLocation === "Us" ? item.priceUs : item.priceGlobal
+
   const spendingsInfo = document.createElement("div");
   spendingsInfo.classList.add("project-info");
   spendingsInfo.innerHTML = `
-    <strong>${name}</strong>
+    <strong>${name} ${doubloonImage} ${price}</strong>
     <span class="count">1</span>
   `;
 
@@ -453,10 +457,12 @@ function addSpendingToList(name, id) {
   removeButton.textContent = "Remove";
   removeButton.addEventListener("click", () => {
     const countSpan = spendingsInfo.querySelector('.count');
+    const nameSpan = spendingsInfo.querySelector('strong');
     let count = parseInt(countSpan.textContent);
     if (count > 1) {
       countSpan.textContent = count - 1;
       totalSpent[id] -= 1;
+      nameSpan.innerHTML = count > 2 ? `${name} ${doubloonImage} ${price}  (${doubloonImage} ${(price * (count-1)).toFixed(0)})` : `${name} ${doubloonImage} ${price}`
     } else {
       spendingsInfoContainer.remove();
       delete totalSpent[id];
@@ -471,7 +477,9 @@ function addSpendingToList(name, id) {
   if (existingItem) {
     // If it exists, increment the count and update total spent
     const countSpan = existingItem.querySelector('.count');
+    const nameSpan = existingItem.querySelector('strong');
     let count = parseInt(countSpan.textContent) + 1;
+    nameSpan.innerHTML = count > 1 ? `${name} ${doubloonImage} ${price}  (${doubloonImage} ${(price * count).toFixed(0)})` : `${name} ${doubloonImage} ${price}`
     countSpan.textContent = count;
     totalSpent[id] += 1; // Increment the spent count
   } else {
@@ -546,11 +554,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check if the item already exists in the spendings list
     const existingItem = [...spendingsList.children].find(item => item.dataset.id === selectedItemId);
 
+    const item = getItemById(selectedItemId);
+    const selectedLocation = locationFilter.value;
+    const price = selectedLocation === "Us" ? item.priceUs : item.priceGlobal
+
     if (existingItem) {
         // If it exists, increment the count and update total spent
         const countSpan = existingItem.querySelector('.count');
+        const name = existingItem.querySelector('strong');
         let count = parseInt(countSpan.textContent) + 1;
         countSpan.textContent = count;
+        name.innerHTML = count > 1 ? `${selectedItemName} ${doubloonImage} ${price}  (${doubloonImage} ${(price * count).toFixed(0)})` : `${selectedItemName} ${doubloonImage} ${price}`
 
         // Update total spent for this item
         totalSpent[selectedItemId] += 1; // Increment the spent count
@@ -562,8 +576,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const spendingsInfo = document.createElement("div");
         spendingsInfo.classList.add("project-info");
         spendingsInfo.innerHTML = `
-            <strong>${selectedItemName}</strong>
-            <span class="count">1</span>
+          <strong>${selectedItemName} ${doubloonImage} ${price}</strong>
+          <span class="count">1</span>
         `;
 
         // Create a remove button
@@ -572,10 +586,12 @@ document.addEventListener("DOMContentLoaded", () => {
         removeButton.textContent = "Remove";
         removeButton.addEventListener("click", () => {
             const countSpan = spendingsInfo.querySelector('.count');
+            const name = spendingsInfo.querySelector('strong');
             let count = parseInt(countSpan.textContent);
             if (count > 1) {
                 countSpan.textContent = count - 1; // Decrement the count
                 totalSpent[selectedItemId] -= 1; // Decrement the spent count
+                name.innerHTML = count > 2 ? `${selectedItemName} ${doubloonImage} ${price}  (${doubloonImage} ${(price * (count-1)).toFixed(0)})` : `${selectedItemName} ${doubloonImage} ${price}`;
             } else {
                 spendingsInfoContainer.remove(); // Remove the item if count is 1
                 delete totalSpent[selectedItemId]; // Remove from total spent tracking
@@ -615,7 +631,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (editingItem) {
         // Update the existing project
         const projectHourlyRate = projectEarnings / projectHours;
-        const projectAverageVotes = (projectHourlyRate - 4.8) / 1.92;
+        const projectAverageVotes = blessed ? (((projectEarnings / 1.2) / projectHours) - 4.8) / 1.92 : (projectHourlyRate - 4.8) / 1.92;
         editingItem.querySelector(".projectNameInfo").textContent = blessed
           ? "🏴‍☠️ " + projectName
           : projectName;
