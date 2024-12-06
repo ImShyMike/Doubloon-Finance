@@ -510,6 +510,25 @@
          "maximumHoursEstimated":16.666666666666664
       },
       {
+         "id":"item_cube",
+         "name":"c u b e",
+         "subtitle":"XMD XT3 V1!",
+         "imageUrl":"https://noras-secret-cdn.hackclub.dev/shop/cube.png",
+         "enabledUs":true,
+         "enabledEu":true,
+         "enabledIn":true,
+         "enabledXx":true,
+         "enabledCa":true,
+         "enabledAll":true,
+         "priceUs":110,
+         "priceGlobal":110,
+         "fulfilledAtEnd":false,
+         "comingSoon":false,
+         "outOfStock":false,
+         "minimumHoursEstimated":4.374999999999999,
+         "maximumHoursEstimated":21.874999999999996
+      },
+      {
          "id":"item_github_notebook_37",
          "name":"GitHub Notebook",
          "subtitle":"Denik Layflat!",
@@ -979,7 +998,7 @@
          "priceGlobal":4980,
          "fulfilledAtEnd":true,
          "comingSoon":false,
-         "outOfStock":true,
+         "outOfStock":false,
          "minimumHoursEstimated":207.49999999999997,
          "maximumHoursEstimated":1037.4999999999998
       },
