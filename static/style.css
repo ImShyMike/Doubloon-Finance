@@ -589,3 +589,19 @@ button:hover {
 .remove-spending-btn:hover {
     background-color: var(--mauve);
 }
+
+#extraDoubloonsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#extraDoubloonsContainer input {
+    padding: 10px;
+    border: 2px solid var(--surface2);
+    border-radius: 5px;
+    background-color: var(--surface0);
+    color: var(--text);
+    font-size: 14px;
+}

@@ -23,6 +23,7 @@ const selectedItemDropdown = document.getElementById("selectedItem");
 const spendingsForm = document.getElementById("spendingsForm");
 const spendingsList = document.getElementById("spendingsList");
 const totalSpentDisplay = document.getElementById("totalSpent");
+const extraDoubloons = document.getElementById("extraDoubloons");
 
 let totalEarnings = 0;
 let totalHours = 0;
@@ -196,7 +197,9 @@ function updateGoalContainer(id) {
     return; // Exit if the item is not found
   }
 
-  let currentDoubloons = Math.max(0, totalEarnings - totalSpentAmount);
+  const extraAmount = parseInt(extraDoubloons.value) || 0;
+  console.log(extraAmount);
+  let currentDoubloons = Math.max(0, (extraAmount + totalEarnings) - totalSpentAmount);
 
   let price = item.enabledUs === true ? item.priceUs : item.priceGlobal;
   goalName.innerHTML = `${item.name} (${price} ${doubloonImage})`;
@@ -686,11 +689,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const jsonString = textDecoder.decode(decodedData);
     const importedData = JSON.parse(jsonString);
 
-    const { filter, projects, selectedItem, spendings } = importedData;
+    const { filter, projects, selectedItem, spendings, extra } = importedData;
 
     if (filter && projects && selectedItem) {
       // Apply location filter
       locationFilter.value = filter;
+      extraDoubloons.value = extra;
 
       // Clear existing projects
       projectsList.innerHTML = "";
@@ -750,11 +754,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .querySelector("strong")
         .textContent.replace("🏴‍☠️ ", "");
       const blessed = !!item.classList.contains("blessedProject");
+      const extra = extraDoubloons.value;
       const [earnings, hours] = [...projectInfo.querySelectorAll(".value")].map(
         (span) => parseFloat(span.textContent.match(/([\d.]+)/)[0]),
       );
 
-      return { name, earnings, hours, blessed };
+      return { name, earnings, hours, blessed, extra };
     });
 
     const jsonString = JSON.stringify({
@@ -771,6 +776,11 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.clipboard.writeText(b64String);
 
     alert("Data copied to clipboard!");
+  });
+
+  extraDoubloons.addEventListener("input", () => {
+    updateGoalContainer(selectedItemId);
+    localStorage.setItem("extra", extraDoubloons.value);
   });
 
   loadShopData().then(() => {
@@ -812,6 +822,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }
+
+    extraDoubloons.value = localStorage.getItem("extra");
 
     // Update total spent display after loading spendings
     updateTotalSpentDisplay(); // Ensure total spent is updated after loading spendings

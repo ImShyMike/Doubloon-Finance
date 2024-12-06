@@ -38,7 +38,7 @@
                 </div>
                 <form id="projectForm" class="project-form">
                     <input type="text" id="projectName" placeholder="Project Name" required>
-                    <input type="number" id="projectEarnings" placeholder="Earnings" required>
+                    <input type="number" step="1" id="projectEarnings" placeholder="Earnings" required>
                     <input type="number" step="0.01" id="projectHours" placeholder="Hours Spent" required>
                     <div class="form-submit-container">
                         <input type="checkbox" id="isBlessed">
@@ -52,6 +52,12 @@
                 <p id="totalHours" class="info">Total Hours: 0</p>
                 <p id="averageHourlyRate" class="info">Hourly Rate: 0 /hour</p>
                 <p id="averageVotes" class="info">Average Votes: 0</p>
+            </div>
+
+            <div id="extraDoubloonsContainer" class="container">
+                <h2>Extra Doubloons</h2>
+
+                <input type="number" step="1" id="extraDoubloons" placeholder="Extra doubloons earned">
             </div>
 
             <div id="spendingsContainer" class="container">
